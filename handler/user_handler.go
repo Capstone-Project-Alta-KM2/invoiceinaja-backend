@@ -23,7 +23,7 @@ func (h *UserHandler) UserRegister(c *gin.Context) {
 	var input user.InputRegister
 	err := c.ShouldBindJSON(&input)
 	if err != nil {
-		res := helper.ApiResponse("Input Data Gagal!1", http.StatusUnprocessableEntity, "gagal", err)
+		res := helper.ApiResponse("Input Data Gagal!", http.StatusUnprocessableEntity, "gagal", err)
 
 		c.JSON(http.StatusUnprocessableEntity, res)
 		return
@@ -31,7 +31,7 @@ func (h *UserHandler) UserRegister(c *gin.Context) {
 
 	_, errUser := h.userService.Register(input)
 	if errUser != nil {
-		res := helper.ApiResponse("Input Data Gagal!2", http.StatusBadRequest, "gagal", errUser)
+		res := helper.ApiResponse("Input Data Gagal!", http.StatusBadRequest, "gagal", errUser)
 
 		c.JSON(http.StatusBadRequest, res)
 		return
@@ -51,14 +51,14 @@ func (h *UserHandler) Login(c *gin.Context) {
 
 	err := c.ShouldBindJSON(&input)
 	if err != nil {
-		res := helper.ApiResponse("Login Failed", http.StatusUnprocessableEntity, "failed", err)
+		res := helper.ApiResponse("Login Gagal!", http.StatusUnprocessableEntity, "gagal", nil)
 		c.JSON(http.StatusUnprocessableEntity, res)
 		return
 	}
 
 	loginUser, errLogin := h.userService.Login(input)
 	if errLogin != nil {
-		res := helper.ApiResponse("Login Gagal", http.StatusUnprocessableEntity, "failed", errLogin)
+		res := helper.ApiResponse("Login Gagal!", http.StatusUnprocessableEntity, "gagal", nil)
 
 		c.JSON(http.StatusUnprocessableEntity, res)
 		return
@@ -67,7 +67,7 @@ func (h *UserHandler) Login(c *gin.Context) {
 	token, errToken := h.authService.GenerateTokenJWT(loginUser.ID, loginUser.Fullname, loginUser.Role)
 
 	if errToken != nil {
-		res := helper.ApiResponse("Fail Create Token", http.StatusBadRequest, "failed", errToken)
+		res := helper.ApiResponse("Gagal Membuat Token", http.StatusBadRequest, "gagal", nil)
 
 		c.JSON(http.StatusBadRequest, res)
 		return
@@ -75,7 +75,7 @@ func (h *UserHandler) Login(c *gin.Context) {
 
 	formatter := user.FormatUser(loginUser, token)
 
-	res := helper.ApiResponse("berhasil login", http.StatusOK, "success", formatter)
+	res := helper.ApiResponse("berhasil login", http.StatusOK, "berhasil", formatter)
 
 	c.JSON(http.StatusCreated, res)
 }

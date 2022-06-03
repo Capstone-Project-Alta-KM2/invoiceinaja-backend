@@ -8,9 +8,14 @@ import (
 	"invoiceinaja/handler"
 
 	"github.com/gin-gonic/gin"
+	"github.com/treblle/treblle-go"
 )
 
 func main() {
+	treblle.Configure(treblle.Configuration{
+		ProjectID: "b6lOPdqzPnWVRR6Z",
+	})
+
 	conf := config.InitConfiguration()
 	database.InitDatabase(conf)
 	db := database.DB
