@@ -1,7 +1,13 @@
 package main
 
-import "fmt"
+import (
+	"invoiceinaja/config"
+	"invoiceinaja/database"
+)
 
 func main() {
-	fmt.Println("Hay Semuanya !!!")
+	conf := config.InitConfiguration()
+	database.InitDatabase(conf)
+	//db := database.DB
+
 }
