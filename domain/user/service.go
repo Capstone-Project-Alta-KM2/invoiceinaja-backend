@@ -10,7 +10,7 @@ type IService interface {
 	Register(input InputRegister) (User, error)
 	Login(input InputLogin) (User, error)
 	GetUserById(id int) (User, error)
-	//IsEmailAvailable(input InputCheckEmail) (bool, error)
+	IsEmailAvailable(input InputCheckEmail) (bool, error)
 }
 
 type service struct {
@@ -45,6 +45,21 @@ func (s *service) Register(input InputRegister) (User, error) {
 	}
 
 	return user, nil
+}
+
+func (s *service) IsEmailAvailable(input InputCheckEmail) (bool, error) {
+	email := input.Email
+
+	user, err := s.repository.FindByEmail(email)
+	if err != nil {
+		return false, err
+	}
+
+	if user.ID == 0 {
+		return true, nil
+	}
+
+	return false, nil
 }
 
 func (s *service) Login(input InputLogin) (User, error) {

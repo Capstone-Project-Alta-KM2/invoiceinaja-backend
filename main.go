@@ -6,6 +6,7 @@ import (
 	"invoiceinaja/database"
 	"invoiceinaja/domain/user"
 	"invoiceinaja/handler"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/treblle/treblle-go"
@@ -23,14 +24,21 @@ func main() {
 	userRepo := user.NewUserRepository(db)
 	userService := user.NewUserService(userRepo)
 	authService := auth.NewService()
-	userController := handler.NewUserHandler(userService, authService)
+	userHandler := handler.NewUserHandler(userService, authService)
 
 	router := gin.Default()
+
+	router.GET("/", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "pong",
+		})
+	})
 	api := router.Group("/api/v1")
 
 	// user
-	api.POST("/users", userController.UserRegister)
-	api.POST("/sessions", userController.Login)
+	api.POST("/users", userHandler.UserRegister)
+	api.POST("/email_checkers", userHandler.CheckEmailAvailability)
+	api.POST("/sessions", userHandler.Login)
 
 	router.Run()
 
