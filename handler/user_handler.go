@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 
 	"invoiceinaja/auth"
@@ -23,9 +24,11 @@ func (h *UserHandler) UserRegister(c *gin.Context) {
 	var input user.InputRegister
 	err := c.ShouldBindJSON(&input)
 	if err != nil {
-		res := helper.ApiResponse("Input Data Gagal!", http.StatusUnprocessableEntity, "gagal", err)
+		errors := helper.FormatValidationError(err)
+		errorMessage := gin.H{"errors": errors}
 
-		c.JSON(http.StatusUnprocessableEntity, res)
+		response := helper.ApiResponse("Input Data Gagal!", http.StatusUnprocessableEntity, "error", errorMessage)
+		c.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
 
@@ -54,7 +57,7 @@ func (h *UserHandler) CheckEmailAvailability(c *gin.Context) {
 		errors := helper.FormatValidationError(err)
 		errorMessage := gin.H{"errors": errors}
 
-		response := helper.ApiResponse("Email checking failed", http.StatusUnprocessableEntity, "error", errorMessage)
+		response := helper.ApiResponse("Email checking failed", http.StatusUnprocessableEntity, "gagal", errorMessage)
 		c.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
@@ -62,7 +65,7 @@ func (h *UserHandler) CheckEmailAvailability(c *gin.Context) {
 	isEmailAvailable, err := h.userService.IsEmailAvailable(input)
 	if err != nil {
 		errorMessage := gin.H{"errors": "Server error"}
-		response := helper.ApiResponse("Email checking failed", http.StatusUnprocessableEntity, "error", errorMessage)
+		response := helper.ApiResponse("Email checking failed", http.StatusUnprocessableEntity, "gagal", errorMessage)
 		c.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
@@ -86,8 +89,11 @@ func (h *UserHandler) Login(c *gin.Context) {
 
 	err := c.ShouldBindJSON(&input)
 	if err != nil {
-		res := helper.ApiResponse("Login Gagal!", http.StatusUnprocessableEntity, "gagal", nil)
-		c.JSON(http.StatusUnprocessableEntity, res)
+		errors := helper.FormatValidationError(err)
+		errorMessage := gin.H{"errors": errors}
+
+		response := helper.ApiResponse("Login Gagal!", http.StatusUnprocessableEntity, "error", errorMessage)
+		c.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
 
@@ -111,6 +117,77 @@ func (h *UserHandler) Login(c *gin.Context) {
 	formatter := user.FormatUser(loginUser, token)
 
 	res := helper.ApiResponse("berhasil login", http.StatusOK, "berhasil", formatter)
+
+	c.JSON(http.StatusCreated, res)
+}
+
+func (h *UserHandler) UploadAvatar(c *gin.Context) {
+	file, err := c.FormFile("avatar")
+	if err != nil {
+		data := gin.H{"is_uploaded": false}
+		res := helper.ApiResponse("Gagal Mengunggah Gambar!", http.StatusBadRequest, "error", data)
+
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+
+	// didapatkan dari JWT
+	currentUser := c.MustGet("currentUser").(user.User)
+	userId := currentUser.ID
+
+	path := fmt.Sprintf("images/%d-%s", userId, file.Filename)
+
+	errImage := c.SaveUploadedFile(file, path)
+	if errImage != nil {
+		data := gin.H{"unggahan": false}
+		res := helper.ApiResponse("Gagal Mengunggah Gambar!", http.StatusBadRequest, "gagal", data)
+
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+
+	_, errUser := h.userService.SaveAvatar(userId, path)
+	if errUser != nil {
+		data := gin.H{"unggahan": false}
+		res := helper.ApiResponse("Gagal Mengunggah Gambar!", http.StatusBadRequest, "gagal", data)
+
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+
+	data := gin.H{"unggahan": true}
+	res := helper.ApiResponse("Berhasil Mengunggah Gambar!", http.StatusOK, "berhasil", data)
+
+	c.JSON(http.StatusOK, res)
+}
+
+func (h *UserHandler) UpdateUser(c *gin.Context) {
+	// cek yg akses login
+	currentUser := c.MustGet("currentUser").(user.User)
+	userId := currentUser.ID
+
+	var input user.InputUpdate
+	err := c.ShouldBindJSON(&input)
+	if err != nil {
+		errors := helper.FormatValidationError(err)
+		errorMessage := gin.H{"errors": errors}
+
+		response := helper.ApiResponse("Gagal Memperbaharui Data", http.StatusUnprocessableEntity, "error", errorMessage)
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	updated, errUpdate := h.userService.UpdateUser(userId, input)
+	if errUpdate != nil {
+		res := helper.ApiResponse("Gagal Memperbaharui Data", http.StatusUnprocessableEntity, "gagal", err)
+
+		c.JSON(http.StatusUnprocessableEntity, res)
+		return
+	}
+
+	formatter := user.FormatUpdateUser(updated)
+
+	res := helper.ApiResponse("Berhasil Memperbaharui Data", http.StatusCreated, "success", formatter)
 
 	c.JSON(http.StatusCreated, res)
 }

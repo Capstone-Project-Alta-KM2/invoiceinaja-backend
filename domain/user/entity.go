@@ -6,6 +6,7 @@ type User struct {
 	ID           int    `gorm:"primary_key;auto_increment;not_null"`
 	Fullname     string `gorm:"type:varchar(50);not null"`
 	Email        string `gorm:"type:varchar(100);not null"`
+	NoTlpn       string `gorm:"type:varchar(100);not null"`
 	Password     string `gorm:"type:longtext;not null"`
 	BusinessName string `gorm:"type:varchar(50);not null"`
 	Role         string `gorm:"type:varchar(10);not null"`
