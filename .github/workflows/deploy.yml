@@ -1,9 +1,5 @@
 name: testing github workflow
-on:
-  push:
-    branches:
-      - "master"
-      
+on: [pull_request]
 jobs:
   Coba-Github-Workflow:
     runs-on: ubuntu-latest
