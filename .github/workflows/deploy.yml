@@ -19,7 +19,7 @@ jobs:
        - run: go test -v ./...
 
   deploy:
-    needs: [Coba-Github-Workflow]
+    needs: [ini-unit-test]
 
     runs-on: ubuntu-latest
 
