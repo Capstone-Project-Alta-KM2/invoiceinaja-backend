@@ -32,6 +32,5 @@ jobs:
         password: ${{ secrets.PASSWORD }}
         port: ${{ secrets.PORT }}
         script: |
-          sudo kill -9 $(sudo lsof -t -i:8080)
           cd aplikasi/invoiceinaja-backend
           git pull origin main
