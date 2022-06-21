@@ -1,9 +1,5 @@
 name: testing github workflow
-on:
-  push:
-    branches:
-      - "master"
-      
+on: [pull_request]
 jobs:
   Coba-Github-Workflow:
     runs-on: ubuntu-latest
@@ -38,3 +34,4 @@ jobs:
         script: |
           cd aplikasi/invoiceinaja-backend
           git pull origin main
+          sudo kill -9 $(sudo lsof -t -i:8080)
