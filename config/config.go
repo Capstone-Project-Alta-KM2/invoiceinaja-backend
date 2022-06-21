@@ -16,7 +16,7 @@ type Config struct {
 
 func InitConfiguration() Config {
 	// logic dapatin env
-	// file(.env, env.yaml, env.json,...), system env
+	// file(.env, env.yaml, env.json,...), system env .
 
 	return Config{
 		SERVER_ADDRESS: GetOrDefault("SERVER_ADDRESS", "0.0.0.0:8080"),
