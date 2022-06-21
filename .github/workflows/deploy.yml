@@ -34,4 +34,6 @@ jobs:
         script: |
           cd aplikasi/invoiceinaja-backend
           git pull origin main
-          sudo kill -9 $(sudo lsof -t -i:8080)
+
+          
+# sudo kill $(sudo lsof -t -i:8080)
