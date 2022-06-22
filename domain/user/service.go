@@ -1,5 +1,6 @@
 package user
 
+//
 import (
 	"errors"
 
