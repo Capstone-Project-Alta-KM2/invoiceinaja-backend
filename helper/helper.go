@@ -4,6 +4,7 @@ import "github.com/go-playground/validator/v10"
 
 type Response struct {
 	MetaMessage Meta        `json:"meta"`
+	Info        interface{} `json:"info_data"`
 	Data        interface{} `json:"data"`
 }
 
@@ -13,7 +14,7 @@ type Meta struct {
 	Status  string `json:"status"`
 }
 
-func ApiResponse(message string, code int, status string, data interface{}) Response {
+func ApiResponse(message string, code int, status string, infoData, data interface{}) Response {
 	metaData := Meta{
 		Message: message,
 		Code:    code,
@@ -22,6 +23,7 @@ func ApiResponse(message string, code int, status string, data interface{}) Resp
 
 	jsonResponse := Response{
 		MetaMessage: metaData,
+		Info:        infoData,
 		Data:        data,
 	}
 

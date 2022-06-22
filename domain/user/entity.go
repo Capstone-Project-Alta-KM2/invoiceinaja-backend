@@ -1,6 +1,8 @@
 package user
 
-import "time"
+import (
+	"time"
+)
 
 type User struct {
 	ID           int    `gorm:"primary_key;auto_increment;not_null"`

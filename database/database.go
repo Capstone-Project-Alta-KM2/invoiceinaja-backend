@@ -2,8 +2,10 @@ package database
 
 import (
 	"fmt"
-	"invoiceinaja/config"
+
 	"log"
+
+	"invoiceinaja/config"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
