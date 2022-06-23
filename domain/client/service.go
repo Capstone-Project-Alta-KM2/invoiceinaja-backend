@@ -4,6 +4,7 @@ type IService interface {
 	AddClient(userID int, input InputAddClient) (Client, error)
 	GetAll(clientID int, page int) ([]Client, int, int, error)
 	GetByID(clientID int) (Client, error)
+	UpdateClient(userID int, input InputUpdate) (Client, error)
 	DeleteClient(clientID int) (Client, error)
 }
 
@@ -51,6 +52,23 @@ func (s *service) GetByID(clientID int) (Client, error) {
 	}
 
 	return client, nil
+}
+
+func (s *service) UpdateClient(userID int, input InputUpdate) (Client, error) {
+	client, errClient := s.repository.FindById(userID)
+	if errClient != nil {
+		return client, errClient
+	}
+
+	// client.Fullname = input.Fullname
+	// client.
+
+	updatedUser, errUpdate := s.repository.Update(client)
+	if errUpdate != nil {
+		return updatedUser, errUpdate
+	}
+
+	return updatedUser, nil
 }
 
 func (s *service) DeleteClient(clientID int) (Client, error) {

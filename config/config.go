@@ -20,11 +20,11 @@ func InitConfiguration() Config {
 
 	return Config{
 		SERVER_ADDRESS: GetOrDefault("SERVER_ADDRESS", "0.0.0.0:8080"),
-		DB_USERNAME:    GetOrDefault("DB_USERNAME", "sql6500946"),
-		DB_PASSWORD:    GetOrDefault("DB_PASSWORD", "pP841AeHLk"),
-		DB_NAME:        GetOrDefault("DB_NAME", "sql6500946"),
+		DB_USERNAME:    GetOrDefault("DB_USERNAME", "admin"),
+		DB_PASSWORD:    GetOrDefault("DB_PASSWORD", "kokolopo123"),
+		DB_NAME:        GetOrDefault("DB_NAME", "invoiceinAja"),
 		DB_PORT:        GetOrDefault("DB_PORT", "3306"),
-		DB_HOST:        GetOrDefault("DB_HOST", "sql6.freesqldatabase.com"),
+		DB_HOST:        GetOrDefault("DB_HOST", "aws-capstone.cd72sjq0y6mo.ap-southeast-1.rds.amazonaws.com"),
 		JWT_KEY:        GetOrDefault("JWT_KEY", "FuFuFuFu"),
 		VT_SERVER_KEY:  GetOrDefault("VT_SERVER_KEY", "VT_SERVER_KEY"),
 		VT_CLIENT_KEY:  GetOrDefault("VT_CLIENT_KEY", "VT_CLIENT_KEY"),
