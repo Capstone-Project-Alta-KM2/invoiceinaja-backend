@@ -93,14 +93,15 @@ func (h *ClientHandler) GetClients(c *gin.Context) {
 }
 
 func (h *ClientHandler) UpdateClient(c *gin.Context) {
+	clientID, _ := strconv.Atoi(c.Param("id"))
 	// cek yg akses login
 	currentUser := c.MustGet("currentUser").(user.User)
 	userId := currentUser.ID
 
-	var input client.InputUpdate
-	err := c.ShouldBindJSON(&input)
-	if err != nil {
-		errors := helper.FormatValidationError(err)
+	// cek apakah client.userID sama denga user yg login
+	clientData, errClient := h.clientService.GetByID(clientID)
+	if errClient != nil {
+		errors := helper.FormatValidationError(errClient)
 		errorMessage := gin.H{"errors": errors}
 
 		response := helper.ApiResponse("Gagal Memperbaharui Data", http.StatusUnprocessableEntity, "error", nil, errorMessage)
@@ -108,19 +109,39 @@ func (h *ClientHandler) UpdateClient(c *gin.Context) {
 		return
 	}
 
-	updated, errUpdate := h.clientService.UpdateClient(userId, input)
-	if errUpdate != nil {
-		res := helper.ApiResponse("Gagal Memperbaharui Data", http.StatusUnprocessableEntity, "gagal", nil, err)
+	if clientData.UserID == userId {
+		var input client.InputUpdate
+		err := c.ShouldBindJSON(&input)
+		if err != nil {
+			errors := helper.FormatValidationError(err)
+			errorMessage := gin.H{"errors": errors}
 
-		c.JSON(http.StatusUnprocessableEntity, res)
+			response := helper.ApiResponse("Gagal Memperbaharui Data", http.StatusUnprocessableEntity, "error", nil, errorMessage)
+			c.JSON(http.StatusUnprocessableEntity, response)
+			return
+		}
+
+		updated, errUpdate := h.clientService.UpdateClient(userId, input)
+		if errUpdate != nil {
+			res := helper.ApiResponse("Gagal Memperbaharui Data", http.StatusUnprocessableEntity, "gagal", nil, err)
+
+			c.JSON(http.StatusUnprocessableEntity, res)
+			return
+		}
+
+		//formatter := user.FormatUpdateUser(updated)
+
+		res := helper.ApiResponse("Berhasil Memperbaharui Data", http.StatusCreated, "success", nil, updated)
+
+		c.JSON(http.StatusCreated, res)
+	} else {
+		failed := gin.H{"status": "failed"}
+
+		response := helper.ApiResponse("Gagal mendapatkan data Clients!", http.StatusBadRequest, "error", nil, failed)
+		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
-	//formatter := user.FormatUpdateUser(updated)
-
-	res := helper.ApiResponse("Berhasil Memperbaharui Data", http.StatusCreated, "success", nil, updated)
-
-	c.JSON(http.StatusCreated, res)
 }
 
 func (h *ClientHandler) DeleteClient(c *gin.Context) {

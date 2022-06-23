@@ -60,8 +60,12 @@ func (s *service) UpdateClient(userID int, input InputUpdate) (Client, error) {
 		return client, errClient
 	}
 
-	// client.Fullname = input.Fullname
-	// client.
+	client.Fullname = input.Fullname
+	client.Email = input.Email
+	client.Address = input.Address
+	client.City = input.City
+	client.ZipCode = input.ZipCode
+	client.Company = input.Company
 
 	updatedUser, errUpdate := s.repository.Update(client)
 	if errUpdate != nil {
