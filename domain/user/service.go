@@ -160,21 +160,28 @@ func (s *service) ResetPassword(input InputCheckEmail) (User, error) {
 	}
 
 	// generate password
-	res, err := password.Generate(10, 7, 3, false, false)
+	newPassword, err := password.Generate(10, 10, 0, true, true)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	//enkripsi password
-	passwordHash, _ := bcrypt.GenerateFromPassword([]byte(res), bcrypt.MinCost)
+	passwordHash, _ := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.MinCost)
 
 	user.Password = string(passwordHash)
 
 	updatePass, errPass := s.repository.Update(user)
 	if errPass != nil {
 		return user, err
-	} else {
-		utl.SendMail(email, res)
+	}
+
+	var a string
+	message := utl.SendMail(email, newPassword)
+	for _, v := range message.ResultsV31 {
+		a = v.Status
+	}
+	if a != "success" {
+		return User{}, errors.New("failed send email")
 	}
 
 	return updatePass, nil
