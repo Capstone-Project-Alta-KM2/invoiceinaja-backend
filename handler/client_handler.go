@@ -93,54 +93,33 @@ func (h *ClientHandler) GetClients(c *gin.Context) {
 }
 
 func (h *ClientHandler) UpdateClient(c *gin.Context) {
-	clientID, _ := strconv.Atoi(c.Param("id"))
-	// cek yg akses login
+	id, _ := strconv.Atoi(c.Param("id"))
+
+	// cek apakah yg akses adalah admin
 	currentUser := c.MustGet("currentUser").(user.User)
-	userId := currentUser.ID
 
-	// cek apakah client.userID sama denga user yg login
-	clientData, errClient := h.clientService.GetByID(clientID)
-	if errClient != nil {
-		errors := helper.FormatValidationError(errClient)
-		errorMessage := gin.H{"errors": errors}
+	var input client.InputUpdate
+	err := c.ShouldBindJSON(&input)
+	if err != nil {
+		res := helper.ApiResponse("Update Data Has Been Failed", http.StatusUnprocessableEntity, "failed", nil, err)
 
-		response := helper.ApiResponse("Gagal Memperbaharui Data", http.StatusUnprocessableEntity, "error", nil, errorMessage)
-		c.JSON(http.StatusUnprocessableEntity, response)
+		c.JSON(http.StatusUnprocessableEntity, res)
 		return
 	}
 
-	if clientData.UserID == userId {
-		var input client.InputUpdate
-		err := c.ShouldBindJSON(&input)
-		if err != nil {
-			errors := helper.FormatValidationError(err)
-			errorMessage := gin.H{"errors": errors}
+	_, errUpdate := h.clientService.UpdateClient(input, currentUser.ID, id)
+	if errUpdate != nil {
+		errorMessage := gin.H{"errors": "data client tidak ada"}
+		res := helper.ApiResponse("Update Data Has Been Failed", http.StatusUnprocessableEntity, "failed", nil, errorMessage)
 
-			response := helper.ApiResponse("Gagal Memperbaharui Data", http.StatusUnprocessableEntity, "error", nil, errorMessage)
-			c.JSON(http.StatusUnprocessableEntity, response)
-			return
-		}
-
-		updated, errUpdate := h.clientService.UpdateClient(userId, input)
-		if errUpdate != nil {
-			res := helper.ApiResponse("Gagal Memperbaharui Data", http.StatusUnprocessableEntity, "gagal", nil, err)
-
-			c.JSON(http.StatusUnprocessableEntity, res)
-			return
-		}
-
-		//formatter := user.FormatUpdateUser(updated)
-
-		res := helper.ApiResponse("Berhasil Memperbaharui Data", http.StatusCreated, "success", nil, updated)
-
-		c.JSON(http.StatusCreated, res)
-	} else {
-		failed := gin.H{"status": "failed"}
-
-		response := helper.ApiResponse("Gagal mendapatkan data Clients!", http.StatusBadRequest, "error", nil, failed)
-		c.JSON(http.StatusBadRequest, response)
+		c.JSON(http.StatusUnprocessableEntity, res)
 		return
 	}
+
+	data := gin.H{"is_uploaded": true}
+	res := helper.ApiResponse("Update Data Has Been Success", http.StatusCreated, "success", nil, data)
+
+	c.JSON(http.StatusCreated, res)
 
 }
 

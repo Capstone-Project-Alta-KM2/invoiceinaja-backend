@@ -1,10 +1,12 @@
 package client
 
+import "errors"
+
 type IService interface {
 	AddClient(userID int, input InputAddClient) (Client, error)
 	GetAll(clientID int, page int) ([]Client, int, int, error)
 	GetByID(clientID int) (Client, error)
-	UpdateClient(userID int, input InputUpdate) (Client, error)
+	UpdateClient(input InputUpdate, userID, clientID int) (Client, error)
 	DeleteClient(clientID int) (Client, error)
 }
 
@@ -54,25 +56,31 @@ func (s *service) GetByID(clientID int) (Client, error) {
 	return client, nil
 }
 
-func (s *service) UpdateClient(userID int, input InputUpdate) (Client, error) {
-	client, errClient := s.repository.FindById(userID)
-	if errClient != nil {
-		return client, errClient
+func (s *service) UpdateClient(input InputUpdate, userID, clientID int) (Client, error) {
+
+	client, errItem := s.repository.FindById(clientID)
+	if errItem != nil {
+		return client, errItem
+	}
+	if client.UserID != userID || client.UserID == 0 {
+		return Client{}, errors.New("bad request")
 	}
 
+	client.ID = clientID
 	client.Fullname = input.Fullname
 	client.Email = input.Email
 	client.Address = input.Address
 	client.City = input.City
 	client.ZipCode = input.ZipCode
 	client.Company = input.Company
+	client.UserID = userID
 
-	updatedUser, errUpdate := s.repository.Update(client)
+	updatedItem, errUpdate := s.repository.Update(client)
 	if errUpdate != nil {
-		return updatedUser, errUpdate
+		return updatedItem, errUpdate
 	}
 
-	return updatedUser, nil
+	return updatedItem, nil
 }
 
 func (s *service) DeleteClient(clientID int) (Client, error) {
