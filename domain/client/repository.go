@@ -9,8 +9,9 @@ import (
 
 type IRepository interface {
 	Save(client Client) (Client, error)
-	FindAll(userID int, page, perPage int) ([]Client, int, error)
+	FindAll(s string, userID, page, perPage int) ([]Client, int, error)
 	FindById(id int) (Client, error)
+	//FindByName(name string) (Client, error)
 	FindByEmail(email string) (Client, error)
 	Update(client Client) (Client, error)
 	Delete(client Client) (Client, error)
@@ -33,7 +34,7 @@ func (r *repository) Save(client Client) (Client, error) {
 	return client, nil
 }
 
-func (r *repository) FindAll(userID int, page, perPage int) ([]Client, int, error) {
+func (r *repository) FindAll(s string, userID, page, perPage int) ([]Client, int, error) {
 	//page, _ := strconv.Atoi(c.Query("page", "1"))
 	//perPage := 9
 	//var total int64
@@ -41,6 +42,10 @@ func (r *repository) FindAll(userID int, page, perPage int) ([]Client, int, erro
 	var total int64
 
 	sql := "SELECT * FROM clients WHERE user_id = " + strconv.Itoa(userID)
+
+	if s != "" {
+		sql = fmt.Sprintf("%s AND fullname LIKE '%%%s%%'", sql, s)
+	}
 
 	r.DB.Raw(sql).Count(&total)
 
@@ -63,6 +68,13 @@ func (r *repository) FindById(id int) (Client, error) {
 
 	return client, nil
 }
+
+// func (r *repository) FindByName(name string) (Client, error) {
+// 	var client Client
+// 	sql := "SELECT * FROM clients"
+
+// 	return client, nil
+// }
 
 func (r *repository) FindByEmail(email string) (Client, error) {
 	var client Client

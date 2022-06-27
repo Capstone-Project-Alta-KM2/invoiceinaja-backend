@@ -64,7 +64,9 @@ func (h *ClientHandler) GetClients(c *gin.Context) {
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	currentUser := c.MustGet("currentUser").(user.User)
 
-	clients, total, perPage, err := h.clientService.GetAll(currentUser.ID, page)
+	name := c.Query("name")
+
+	clients, total, perPage, err := h.clientService.GetAll(name, currentUser.ID, page)
 	if err != nil {
 		errors := helper.FormatValidationError(err)
 		errorMessage := gin.H{"errors": errors}

@@ -4,7 +4,7 @@ import "errors"
 
 type IService interface {
 	AddClient(userID int, input InputAddClient) (Client, error)
-	GetAll(clientID int, page int) ([]Client, int, int, error)
+	GetAll(search string, clientID, page int) ([]Client, int, int, error)
 	GetByID(clientID int) (Client, error)
 	UpdateClient(input InputUpdate, userID, clientID int) (Client, error)
 	DeleteClient(clientID int) (Client, error)
@@ -37,9 +37,9 @@ func (s *service) AddClient(userID int, input InputAddClient) (Client, error) {
 	return client, nil
 }
 
-func (s *service) GetAll(clientID int, page int) ([]Client, int, int, error) {
+func (s *service) GetAll(search string, clientID, page int) ([]Client, int, int, error) {
 	perPage := 5
-	clients, total, err := s.repository.FindAll(clientID, page, perPage)
+	clients, total, err := s.repository.FindAll(search, clientID, page, perPage)
 	if err != nil {
 		return clients, 0, 0, err
 	}
