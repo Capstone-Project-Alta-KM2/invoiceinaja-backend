@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 
 	"invoiceinaja/auth"
@@ -78,6 +79,37 @@ func (h *InvoiceHandler) AddInvoice(c *gin.Context) {
 		c.JSON(http.StatusCreated, res)
 	}
 
+}
+
+func (h *InvoiceHandler) GenerateByCSV(c *gin.Context) {
+	file, err := c.FormFile("csv_file")
+	if err != nil {
+		data := gin.H{"is_uploaded": false}
+		res := helper.ApiResponse("Gagal Mengunggah Gambar!", http.StatusBadRequest, "error", nil, data)
+
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+
+	// didapatkan dari JWT
+	currentUser := c.MustGet("currentUser").(user.User)
+	userId := currentUser.ID
+
+	path := fmt.Sprintf("csv_file/%d-%s", userId, file.Filename)
+
+	errImage := c.SaveUploadedFile(file, path)
+	if errImage != nil {
+		data := gin.H{"unggahan": false}
+		res := helper.ApiResponse("Gagal Mengunggah Gambar!", http.StatusBadRequest, "gagal", nil, data)
+
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+
+	data := gin.H{"unggahan": true}
+	res := helper.ApiResponse("Berhasil Mengunggah Gambar!", http.StatusOK, "berhasil", nil, data)
+
+	c.JSON(http.StatusOK, res)
 }
 
 func (h *InvoiceHandler) GetInvoices(c *gin.Context) {

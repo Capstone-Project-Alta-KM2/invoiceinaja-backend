@@ -35,5 +35,6 @@ func APIRoutes(router *gin.Engine, userHandler *handler.UserHandler, clientHandl
 
 	// invoice
 	api.POST("/invoices", auth.AuthMiddleware(authService, userService), invoiceHandler.AddInvoice)
+	api.POST("/invoices_by_csv", auth.AuthMiddleware(authService, userService), invoiceHandler.GenerateByCSV)
 	api.GET("/invoices", auth.AuthMiddleware(authService, userService), invoiceHandler.GetInvoices)
 }
