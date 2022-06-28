@@ -2,7 +2,6 @@ package handler
 
 import (
 	"errors"
-	"math"
 	"net/http"
 	"strconv"
 
@@ -41,23 +40,39 @@ func (h *ClientHandler) AddClient(c *gin.Context) {
 	// // didapatkan dari JWT
 	currentUser := c.MustGet("currentUser").(user.User)
 
-	_, errClient := h.clientService.AddClient(currentUser.ID, input)
-	if errClient != nil {
-		errors := helper.FormatValidationError(errClient)
-		errorMessage := gin.H{"errors": errors}
-
-		response := helper.ApiResponse("Menambahkan Client Baru Gagal!", http.StatusUnprocessableEntity, "error", nil, errorMessage)
+	isEmailAvailable, errAvail := h.clientService.IsEmailClientAvailable(input.Email, currentUser.ID)
+	if errAvail != nil {
+		errorMessage := gin.H{"errors": "Server error"}
+		response := helper.ApiResponse("Email checking failed", http.StatusUnprocessableEntity, "gagal", nil, errorMessage)
 		c.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
 
-	data := gin.H{
-		"status": "Berhasil Menambahkan Client Baru!",
+	if !isEmailAvailable {
+		data := gin.H{
+			"status": "Gagal Membuat Akun Baru!",
+		}
+		res := helper.ApiResponse("Email sudah digunakan!", http.StatusBadRequest, "gagal", nil, data)
+		c.JSON(http.StatusBadRequest, res)
+	} else {
+		_, errClient := h.clientService.AddClient(currentUser.ID, input)
+		if errClient != nil {
+			errors := helper.FormatValidationError(errClient)
+			errorMessage := gin.H{"errors": errors}
+
+			response := helper.ApiResponse("Menambahkan Client Baru Gagal!", http.StatusUnprocessableEntity, "error", nil, errorMessage)
+			c.JSON(http.StatusUnprocessableEntity, response)
+			return
+		}
+
+		data := gin.H{
+			"status": "Berhasil Menambahkan Client Baru!",
+		}
+
+		res := helper.ApiResponse("Berhasil Membuat client Baru!", http.StatusCreated, "berhasil", nil, data)
+
+		c.JSON(http.StatusCreated, res)
 	}
-
-	res := helper.ApiResponse("Berhasil Membuat client Baru!", http.StatusCreated, "berhasil", nil, data)
-
-	c.JSON(http.StatusCreated, res)
 }
 
 func (h *ClientHandler) GetClients(c *gin.Context) {
@@ -78,9 +93,9 @@ func (h *ClientHandler) GetClients(c *gin.Context) {
 
 	var lastPage float64
 	if total%5 >= 1 && total%5 <= 4 {
-		lastPage = math.Ceil(float64(total/perPage)) + 1
+		lastPage = float64(total/perPage + 1)
 	} else {
-		lastPage = math.Ceil(float64(total / perPage))
+		lastPage = float64(total / perPage)
 	}
 
 	info := gin.H{

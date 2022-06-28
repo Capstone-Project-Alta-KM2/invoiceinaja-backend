@@ -40,7 +40,7 @@ func (h *UserHandler) UserRegister(c *gin.Context) {
 		return
 	}
 
-	if isEmailAvailable != true {
+	if !isEmailAvailable {
 		data := gin.H{
 			"status": "Gagal Membuat Akun Baru!",
 		}

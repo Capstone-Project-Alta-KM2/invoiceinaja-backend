@@ -12,7 +12,7 @@ type IRepository interface {
 	FindAll(s string, userID, page, perPage int) ([]Client, int, error)
 	FindById(id int) (Client, error)
 	//FindByName(name string) (Client, error)
-	FindByEmail(email string) (Client, error)
+	FindByEmail(email string, userID int) (Client, error)
 	Update(client Client) (Client, error)
 	Delete(client Client) (Client, error)
 }
@@ -76,10 +76,10 @@ func (r *repository) FindById(id int) (Client, error) {
 // 	return client, nil
 // }
 
-func (r *repository) FindByEmail(email string) (Client, error) {
+func (r *repository) FindByEmail(email string, userID int) (Client, error) {
 	var client Client
 
-	err := r.DB.Where("email = ?", email).Find(&client).Error
+	err := r.DB.Where("email = ?", email).Where("user_id = ?", userID).Find(&client).Error
 	if err != nil {
 		return client, err
 	}

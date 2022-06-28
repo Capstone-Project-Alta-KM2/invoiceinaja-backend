@@ -4,6 +4,7 @@ import "errors"
 
 type IService interface {
 	AddClient(userID int, input InputAddClient) (Client, error)
+	IsEmailClientAvailable(input string, userID int) (bool, error)
 	GetAll(search string, clientID, page int) ([]Client, int, int, error)
 	GetByID(clientID int) (Client, error)
 	UpdateClient(input InputUpdate, userID, clientID int) (Client, error)
@@ -18,7 +19,26 @@ func NewUserService(repository IRepository) *service {
 	return &service{repository}
 }
 
+func (s *service) IsEmailClientAvailable(input string, userID int) (bool, error) {
+	client, err := s.repository.FindByEmail(input, userID)
+	if err != nil {
+		return false, err
+	}
+
+	if client.ID == 0 {
+		return true, nil
+	}
+
+	return false, nil
+}
+
 func (s *service) AddClient(userID int, input InputAddClient) (Client, error) {
+
+	clientExist, errExist := s.repository.FindByEmail(input.Email, userID)
+	if clientExist.ID != 0 {
+		return clientExist, errExist
+	}
+
 	var data Client
 
 	data.Fullname = input.Fullname
