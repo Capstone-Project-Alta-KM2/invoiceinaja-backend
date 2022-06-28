@@ -46,13 +46,13 @@ func (h *InvoiceHandler) AddInvoice(c *gin.Context) {
 		return
 	}
 	if client.UserID == 0 {
-		res := helper.ApiResponse("client g ada!", http.StatusUnprocessableEntity, "failed", nil, errClient)
+		res := helper.ApiResponse("Client not found!", http.StatusUnprocessableEntity, "failed", nil, errClient)
 
 		c.JSON(http.StatusUnprocessableEntity, res)
 		return
 	}
 	if client.UserID != currentUser.ID {
-		res := helper.ApiResponse("ini bukan client anda!", http.StatusUnprocessableEntity, "failed", nil, errClient)
+		res := helper.ApiResponse("This is not your client!", http.StatusUnprocessableEntity, "failed", nil, errClient)
 
 		c.JSON(http.StatusUnprocessableEntity, res)
 		return
@@ -85,7 +85,7 @@ func (h *InvoiceHandler) GenerateByCSV(c *gin.Context) {
 	file, err := c.FormFile("csv_file")
 	if err != nil {
 		data := gin.H{"is_uploaded": false}
-		res := helper.ApiResponse("Gagal Mengunggah Gambar!", http.StatusBadRequest, "error", nil, data)
+		res := helper.ApiResponse("Failed to Upload Image!", http.StatusBadRequest, "error", nil, data)
 
 		c.JSON(http.StatusBadRequest, res)
 		return
@@ -99,15 +99,15 @@ func (h *InvoiceHandler) GenerateByCSV(c *gin.Context) {
 
 	errImage := c.SaveUploadedFile(file, path)
 	if errImage != nil {
-		data := gin.H{"unggahan": false}
-		res := helper.ApiResponse("Gagal Mengunggah Gambar!", http.StatusBadRequest, "gagal", nil, data)
+		data := gin.H{"is_uploaded": false}
+		res := helper.ApiResponse("Failed to Upload Image!", http.StatusBadRequest, "failed", nil, data)
 
 		c.JSON(http.StatusBadRequest, res)
 		return
 	}
 
-	data := gin.H{"unggahan": true}
-	res := helper.ApiResponse("Berhasil Mengunggah Gambar!", http.StatusOK, "berhasil", nil, data)
+	data := gin.H{"is_uploaded": true}
+	res := helper.ApiResponse("Succesfully Uploaded Image!", http.StatusOK, "success", nil, data)
 
 	c.JSON(http.StatusOK, res)
 }

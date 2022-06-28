@@ -32,7 +32,7 @@ func (h *ClientHandler) AddClient(c *gin.Context) {
 		errors := helper.FormatValidationError(err)
 		errorMessage := gin.H{"errors": errors}
 
-		response := helper.ApiResponse("Login Gagal!", http.StatusUnprocessableEntity, "error", nil, errorMessage)
+		response := helper.ApiResponse("Login Failed!", http.StatusUnprocessableEntity, "error", nil, errorMessage)
 		c.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
@@ -43,16 +43,16 @@ func (h *ClientHandler) AddClient(c *gin.Context) {
 	isEmailAvailable, errAvail := h.clientService.IsEmailClientAvailable(input.Email, currentUser.ID)
 	if errAvail != nil {
 		errorMessage := gin.H{"errors": "Server error"}
-		response := helper.ApiResponse("Email checking failed", http.StatusUnprocessableEntity, "gagal", nil, errorMessage)
+		response := helper.ApiResponse("Email checking failed", http.StatusUnprocessableEntity, "failed", nil, errorMessage)
 		c.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
 
 	if !isEmailAvailable {
 		data := gin.H{
-			"status": "Gagal Membuat Akun Baru!",
+			"status": "Failed to make New Account!",
 		}
-		res := helper.ApiResponse("Email sudah digunakan!", http.StatusBadRequest, "gagal", nil, data)
+		res := helper.ApiResponse("Email already used!", http.StatusBadRequest, "failed", nil, data)
 		c.JSON(http.StatusBadRequest, res)
 	} else {
 		_, errClient := h.clientService.AddClient(currentUser.ID, input)
@@ -60,16 +60,16 @@ func (h *ClientHandler) AddClient(c *gin.Context) {
 			errors := helper.FormatValidationError(errClient)
 			errorMessage := gin.H{"errors": errors}
 
-			response := helper.ApiResponse("Menambahkan Client Baru Gagal!", http.StatusUnprocessableEntity, "error", nil, errorMessage)
+			response := helper.ApiResponse("Failed to added New Client!", http.StatusUnprocessableEntity, "error", nil, errorMessage)
 			c.JSON(http.StatusUnprocessableEntity, response)
 			return
 		}
 
 		data := gin.H{
-			"status": "Berhasil Menambahkan Client Baru!",
+			"status": "Successfully added New Client!",
 		}
 
-		res := helper.ApiResponse("Berhasil Membuat client Baru!", http.StatusCreated, "berhasil", nil, data)
+		res := helper.ApiResponse("Succsessfully created New Client!", http.StatusCreated, "success", nil, data)
 
 		c.JSON(http.StatusCreated, res)
 	}
@@ -86,7 +86,7 @@ func (h *ClientHandler) GetClients(c *gin.Context) {
 		errors := helper.FormatValidationError(err)
 		errorMessage := gin.H{"errors": errors}
 
-		response := helper.ApiResponse("Gagal mendapatkan data Clients!", http.StatusBadRequest, "error", nil, errorMessage)
+		response := helper.ApiResponse("Failed to get Clients Data!", http.StatusBadRequest, "error", nil, errorMessage)
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
@@ -104,7 +104,7 @@ func (h *ClientHandler) GetClients(c *gin.Context) {
 		"last_page": lastPage,
 	}
 	formatter := client.FormatClients(clients)
-	res := helper.ApiResponse("Berhasil mendapatkan data Clients!", http.StatusOK, "berhasil", info, formatter)
+	res := helper.ApiResponse("Succesfully to get Client Data!", http.StatusOK, "success", info, formatter)
 
 	c.JSON(http.StatusOK, res)
 }
@@ -126,7 +126,7 @@ func (h *ClientHandler) UpdateClient(c *gin.Context) {
 
 	_, errUpdate := h.clientService.UpdateClient(input, currentUser.ID, id)
 	if errUpdate != nil {
-		errorMessage := gin.H{"errors": "data client tidak ada"}
+		errorMessage := gin.H{"errors": "Client Data does'nt exist"}
 		res := helper.ApiResponse("Update Data Has Been Failed", http.StatusUnprocessableEntity, "failed", nil, errorMessage)
 
 		c.JSON(http.StatusUnprocessableEntity, res)
@@ -162,7 +162,7 @@ func (h *ClientHandler) DeleteClient(c *gin.Context) {
 	}
 
 	if currentUser.ID != client.UserID {
-		res := helper.ApiResponse("Failed to Delete Client", http.StatusBadRequest, "failed", nil, errors.New("kamu bukan tidak berhak"))
+		res := helper.ApiResponse("Failed to Delete Client", http.StatusBadRequest, "failed", nil, errors.New("You don't have access"))
 
 		c.JSON(http.StatusBadRequest, res)
 		return
