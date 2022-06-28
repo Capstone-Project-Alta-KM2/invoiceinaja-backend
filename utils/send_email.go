@@ -20,10 +20,10 @@ func SendMail(destination, newPassword string) *mailjet.ResultsV31 {
 					Name:  destination,
 				},
 			},
-			Subject:  "Hay Aden ini InvoiceinAja.",
-			TextPart: "hay ini email make mailjet",
-			HTMLPart: "<h3>Dear passenger 1, welcome to <a href='https://www.mailjet.com/'>Mailjet</a>!</h3><br />May the delivery force be with you!" + newPassword,
-			CustomID: "AppGettingStartedTest",
+			TemplateID:       4035911,
+			TemplateLanguage: true,
+			Subject:          "Reset Password InvoiceinAja",
+			Variables:        map[string]interface{}{"new_password": newPassword},
 		},
 	}
 	messages := mailjet.MessagesV31{Info: messagesInfo}

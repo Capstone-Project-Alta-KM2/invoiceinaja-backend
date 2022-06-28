@@ -2,11 +2,9 @@ package user
 
 import (
 	"errors"
-	"log"
 
 	utl "invoiceinaja/utils"
 
-	"github.com/sethvargo/go-password/password"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -160,10 +158,11 @@ func (s *service) ResetPassword(input InputCheckEmail) (User, error) {
 	}
 
 	// generate password
-	newPassword, err := password.Generate(10, 10, 0, true, true)
-	if err != nil {
-		log.Fatal(err)
-	}
+	newPassword := utl.RandomString(12)
+	// newPassword, err := password.Generate(10, 10, 0, true, true)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
 	//enkripsi password
 	passwordHash, _ := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.MinCost)
