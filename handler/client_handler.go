@@ -32,7 +32,7 @@ func (h *ClientHandler) AddClient(c *gin.Context) {
 		errors := helper.FormatValidationError(err)
 		errorMessage := gin.H{"errors": errors}
 
-		response := helper.ApiResponse("Login Failed!", http.StatusUnprocessableEntity, "error", nil, errorMessage)
+		response := helper.ApiResponse("Add Client Failed!", http.StatusUnprocessableEntity, "error", nil, errorMessage)
 		c.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
@@ -50,9 +50,9 @@ func (h *ClientHandler) AddClient(c *gin.Context) {
 
 	if !isEmailAvailable {
 		data := gin.H{
-			"status": "Failed to make New Account!",
+			"status": "Failed to Add New Client!",
 		}
-		res := helper.ApiResponse("Email already used!", http.StatusBadRequest, "failed", nil, data)
+		res := helper.ApiResponse("Email is already used!", http.StatusBadRequest, "failed", nil, data)
 		c.JSON(http.StatusBadRequest, res)
 	} else {
 		_, errClient := h.clientService.AddClient(currentUser.ID, input)
@@ -162,7 +162,7 @@ func (h *ClientHandler) DeleteClient(c *gin.Context) {
 	}
 
 	if currentUser.ID != client.UserID {
-		res := helper.ApiResponse("Failed to Delete Client", http.StatusBadRequest, "failed", nil, errors.New("You don't have access"))
+		res := helper.ApiResponse("Failed to Delete Client", http.StatusBadRequest, "failed", nil, errors.New("you don't have access"))
 
 		c.JSON(http.StatusBadRequest, res)
 		return
