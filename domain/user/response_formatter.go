@@ -2,10 +2,10 @@ package user
 
 type UserFormatter struct {
 	Id           int    `json:"id"`
-	Fullname     string `json:"nama_lengkap"`
+	Fullname     string `json:"fullname"`
 	Email        string `json:"email"`
-	NoTlpn       string `json:"no_tlpn"`
-	BusinessName string `json:"nama_bisnis"`
+	NoTlpn       string `json:"phone_number"`
+	BusinessName string `json:"company"`
 	Password     string `json:"password"`
 	Avatar       string `json:"avatar"`
 	Token        string `json:"token"`
