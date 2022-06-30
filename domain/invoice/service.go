@@ -1,9 +1,12 @@
 package invoice
 
+import "errors"
+
 type IService interface {
 	AddInvoice(input InputAddInvoice) (Invoice, error)
 	SaveDetail(invoiceID int, input InputAddInvoice) ([]DetailInvoice, error)
 	GetInvoices(userID int) ([]Invoice, error)
+	GetInvoiceByID(invoiceID int) (Invoice, error)
 	// GetAll(clientID int) ([]Client, error)
 	// GetByID(clientID int) (Client, error)
 	// DeleteClient(clientID int) (Client, error)
@@ -57,4 +60,16 @@ func (s *service) GetInvoices(userID int) ([]Invoice, error) {
 	}
 
 	return clients, nil
+}
+
+func (s *service) GetInvoiceByID(invoiceID int) (Invoice, error) {
+	invoice, err := s.repository.FindByID(invoiceID)
+	if err != nil {
+		return invoice, err
+	}
+
+	if invoice.ID == 0 {
+		return invoice, errors.New("no invoice found")
+	}
+	return invoice, nil
 }

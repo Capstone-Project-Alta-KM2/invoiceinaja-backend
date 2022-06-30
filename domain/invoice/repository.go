@@ -8,6 +8,7 @@ type IRepository interface {
 	Save(invoice Invoice) (Invoice, error)
 	SaveDetail(detail []DetailInvoice) ([]DetailInvoice, error)
 	FindAll(userID int) ([]Invoice, error)
+	FindByID(id int) (Invoice, error)
 	// FindById(id int) (Invoice, error)
 	// FindByEmail(email string) (Invoice, error)
 	// Update(invoice Invoice) (Invoice, error)
@@ -55,4 +56,14 @@ func (r *repository) FindAll(userID int) ([]Invoice, error) {
 	}
 
 	return invoicesByUser, nil
+}
+
+func (r *repository) FindByID(id int) (Invoice, error) {
+	var invoice Invoice
+	err := r.DB.Where("id = ?", id).Preload("Client").Preload("Items", "detail_invoices.invoice_id").Order("id desc").Find(&invoice).Error
+	if err != nil {
+		return invoice, err
+	}
+
+	return invoice, nil
 }
