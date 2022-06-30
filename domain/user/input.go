@@ -1,16 +1,16 @@
 package user
 
 type InputRegister struct {
-	Fullname     string `json:"nama_lengkap" binding:"required"`
+	Fullname     string `json:"fullname" binding:"required"`
 	Email        string `json:"email" binding:"required,email"`
-	NoTlpn       string `json:"no_tlpn" binding:"required"`
-	BusinessName string `json:"nama_bisnis" binding:"required"`
-	Password     string `json:"kata_sandi" binding:"required"`
+	NoTlpn       string `json:"phone_number" binding:"required"`
+	BusinessName string `json:"company" binding:"required"`
+	Password     string `json:"password" binding:"required"`
 }
 
 type InputLogin struct {
 	Email    string `json:"email" binding:"required,email"`
-	Password string `json:"kata_sandi" binding:"required"`
+	Password string `json:"password" binding:"required"`
 }
 
 type InputCheckEmail struct {
@@ -18,8 +18,8 @@ type InputCheckEmail struct {
 }
 
 type InputUpdate struct {
-	Fullname     string `json:"nama_lengkap" binding:"required"`
+	Fullname     string `json:"fullname" binding:"required"`
 	Email        string `json:"email" binding:"required,email"`
-	NoTlpn       string `json:"no_tlpn" binding:"required"`
-	BusinessName string `json:"nama_bisnis" binding:"required"`
+	NoTlpn       string `json:"phone_number" binding:"required"`
+	BusinessName string `json:"company" binding:"required"`
 }
