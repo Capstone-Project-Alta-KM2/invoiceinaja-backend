@@ -6,7 +6,7 @@ import (
 	"github.com/mailjet/mailjet-apiv3-go"
 )
 
-func SendMail(destination, newPassword string) *mailjet.ResultsV31 {
+func SendMailResetPassword(destination, newPassword string) *mailjet.ResultsV31 {
 	mailjetClient := mailjet.NewMailjetClient("5f4b8dba26ef85efb6dce6410157bbe9", "efd86ba2c3502512da935ad19de63869")
 	messagesInfo := []mailjet.InfoMessagesV31{
 		{

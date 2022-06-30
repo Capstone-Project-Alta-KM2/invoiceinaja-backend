@@ -175,7 +175,7 @@ func (s *service) ResetPassword(input InputCheckEmail) (User, error) {
 	}
 
 	var a string
-	message := utl.SendMail(email, newPassword)
+	message := utl.SendMailResetPassword(email, newPassword)
 	for _, v := range message.ResultsV31 {
 		a = v.Status
 	}
