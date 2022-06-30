@@ -1,12 +1,16 @@
 package invoice
 
-import "errors"
+import (
+	"errors"
+	"invoiceinaja/domain/client"
+	"invoiceinaja/domain/user"
+)
 
 type IService interface {
 	AddInvoice(input InputAddInvoice) (Invoice, error)
 	SaveDetail(invoiceID int, input InputAddInvoice) ([]DetailInvoice, error)
 	GetInvoices(userID int) ([]Invoice, error)
-	GetInvoiceByID(invoiceID int) (Invoice, error)
+	SendMailInvoice(invoiceID int, user user.User, client client.Client) (Invoice, error)
 	// GetAll(clientID int) ([]Client, error)
 	// GetByID(clientID int) (Client, error)
 	// DeleteClient(clientID int) (Client, error)
@@ -41,7 +45,7 @@ func (s *service) SaveDetail(invoiceID int, input InputAddInvoice) ([]DetailInvo
 	var detail []DetailInvoice
 
 	for _, v := range input.DetailInvoice {
-		detail = append(detail, DetailInvoice{InvoiceID: invoiceID, ItemName: v.ItemName, Price: v.Price, Quantity: v.Price})
+		detail = append(detail, DetailInvoice{InvoiceID: invoiceID, ItemName: v.ItemName, Price: v.Price, Quantity: v.Quantity})
 	}
 
 	//save data yang sudah dimapping kedalam struct DetailOrder
@@ -62,7 +66,9 @@ func (s *service) GetInvoices(userID int) ([]Invoice, error) {
 	return clients, nil
 }
 
-func (s *service) GetInvoiceByID(invoiceID int) (Invoice, error) {
+func (s *service) SendMailInvoice(invoiceID int, user user.User, client client.Client) (Invoice, error) {
+	var data SendEmailData
+
 	invoice, err := s.repository.FindByID(invoiceID)
 	if err != nil {
 		return invoice, err
@@ -71,5 +77,24 @@ func (s *service) GetInvoiceByID(invoiceID int) (Invoice, error) {
 	if invoice.ID == 0 {
 		return invoice, errors.New("no invoice found")
 	}
+
+	data.Invoice.ID = invoice.ID
+	data.Invoice.Status = invoice.Status
+	data.Invoice.TotalAmount = invoice.TotalAmount
+	data.Invoice.InvoiceDate = invoice.InvoiceDate
+	data.Invoice.InvoiceDue = invoice.InvoiceDue
+	data.User.Fullname = user.Fullname
+	data.User.BusinessName = user.BusinessName
+	data.User.Email = user.Email
+	data.Client.Fullname = client.Fullname
+	data.Client.Email = client.Email
+	data.Client.Address = client.Address
+	data.Client.City = client.City
+	data.Client.ZipCode = client.ZipCode
+	data.Client.Company = client.Company
+	data.Invoice.Items = append(data.Invoice.Items, invoice.Items...)
+
+	SendMailInvoice(data.Client.Email, data)
+
 	return invoice, nil
 }

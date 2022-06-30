@@ -73,6 +73,13 @@ func (h *InvoiceHandler) AddInvoice(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, res)
 		}
 
+		_, errData := h.invoiceService.SendMailInvoice(newInvoice.ID, currentUser, client)
+		if errData != nil {
+			res := helper.ApiResponse("Send Invoice Has Been Failed", http.StatusBadRequest, "failed", nil, errOrder)
+
+			c.JSON(http.StatusBadRequest, res)
+		}
+
 		data := gin.H{"is_recorded": true}
 		res := helper.ApiResponse("Order Has Been Created", http.StatusCreated, "success", nil, data)
 
