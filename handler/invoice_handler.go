@@ -31,7 +31,7 @@ func (h *InvoiceHandler) AddInvoice(c *gin.Context) {
 	// tangkap input body
 	err := c.ShouldBindJSON(&input)
 	if err != nil {
-		res := helper.ApiResponse("New Data Has Been Failed1", http.StatusUnprocessableEntity, "failed", nil, err)
+		res := helper.ApiResponse("Add New Data Has Been Failed", http.StatusUnprocessableEntity, "failed", nil, err)
 
 		c.JSON(http.StatusUnprocessableEntity, res)
 		return
@@ -60,7 +60,7 @@ func (h *InvoiceHandler) AddInvoice(c *gin.Context) {
 		// record data invoice
 		newInvoice, errOrder := h.invoiceService.AddInvoice(input)
 		if errOrder != nil {
-			res := helper.ApiResponse("Invoice Has Been Failed", http.StatusBadRequest, "failed", nil, errOrder)
+			res := helper.ApiResponse("Add Invoice Has Been Failed", http.StatusBadRequest, "failed", nil, errOrder)
 
 			c.JSON(http.StatusBadRequest, res)
 		}
@@ -68,7 +68,7 @@ func (h *InvoiceHandler) AddInvoice(c *gin.Context) {
 		// record data detail order
 		_, errDetails := h.invoiceService.SaveDetail(newInvoice.ID, input)
 		if errDetails != nil {
-			res := helper.ApiResponse("New Data Has Been Failed", http.StatusBadRequest, "failed", nil, errDetails)
+			res := helper.ApiResponse("Save Data Has Been Failed", http.StatusBadRequest, "failed", nil, errDetails)
 
 			c.JSON(http.StatusBadRequest, res)
 		}
@@ -85,7 +85,7 @@ func (h *InvoiceHandler) GenerateByCSV(c *gin.Context) {
 	file, err := c.FormFile("csv_file")
 	if err != nil {
 		data := gin.H{"is_uploaded": false}
-		res := helper.ApiResponse("Failed to Upload Image!", http.StatusBadRequest, "error", nil, data)
+		res := helper.ApiResponse("Failed to Upload File!", http.StatusBadRequest, "error", nil, data)
 
 		c.JSON(http.StatusBadRequest, res)
 		return
@@ -100,14 +100,14 @@ func (h *InvoiceHandler) GenerateByCSV(c *gin.Context) {
 	errImage := c.SaveUploadedFile(file, path)
 	if errImage != nil {
 		data := gin.H{"is_uploaded": false}
-		res := helper.ApiResponse("Failed to Upload Image!", http.StatusBadRequest, "failed", nil, data)
+		res := helper.ApiResponse("Failed to Upload File!", http.StatusBadRequest, "failed", nil, data)
 
 		c.JSON(http.StatusBadRequest, res)
 		return
 	}
 
 	data := gin.H{"is_uploaded": true}
-	res := helper.ApiResponse("Succesfully Uploaded Image!", http.StatusOK, "success", nil, data)
+	res := helper.ApiResponse("Succesfully Uploaded File!", http.StatusOK, "success", nil, data)
 
 	c.JSON(http.StatusOK, res)
 }
