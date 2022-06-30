@@ -7,6 +7,13 @@ type InvoiceFormatter struct {
 	PostDue string `json:"post_due"`
 	Amount  int    `json:"Amount"`
 	Status  string `json:"status"`
+	Items   []ItemFormatter
+}
+
+type ItemFormatter struct {
+	ItemName string `json:"item_name"`
+	Price    int    `json:"price"`
+	Quantity int    `json:"quantity"`
 }
 
 func FormatInvoice(Invoice Invoice) InvoiceFormatter {
@@ -17,6 +24,7 @@ func FormatInvoice(Invoice Invoice) InvoiceFormatter {
 		PostDue: Invoice.InvoiceDue,
 		Amount:  Invoice.TotalAmount,
 		Status:  Invoice.Status,
+		Items:   FormatItem(Invoice),
 	}
 
 	return formatter
@@ -35,4 +43,18 @@ func FormatInvoices(invoice []Invoice) []InvoiceFormatter {
 	}
 
 	return invoicesFormatter
+}
+
+func FormatItem(item Invoice) []ItemFormatter {
+	var detail []ItemFormatter
+
+	for _, v := range item.Items {
+		detail = append(detail, ItemFormatter{
+			ItemName: v.ItemName,
+			Price:    v.Price,
+			Quantity: v.Quantity,
+		})
+	}
+
+	return detail
 }

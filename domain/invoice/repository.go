@@ -43,7 +43,7 @@ func (r *repository) SaveDetail(detail []DetailInvoice) ([]DetailInvoice, error)
 func (r *repository) FindAll(userID int) ([]Invoice, error) {
 	var invoices []Invoice
 	var invoicesByUser []Invoice
-	err := r.DB.Preload("Client").Find(&invoices).Error
+	err := r.DB.Preload("Client").Preload("Items", "detail_invoices.invoice_id").Order("id desc").Find(&invoices).Error
 	if err != nil {
 		return invoices, err
 	}

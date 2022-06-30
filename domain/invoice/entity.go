@@ -13,6 +13,7 @@ type Invoice struct {
 	TotalAmount int           `gorm:"type:int(100);not null"`
 	PaymentURL  string        `gorm:"type:varchar(100);not null"`
 	Status      string        `gorm:"type:varchar(100);not null"`
+	Items       []DetailInvoice
 	InvoiceDate string
 	InvoiceDue  string
 }
