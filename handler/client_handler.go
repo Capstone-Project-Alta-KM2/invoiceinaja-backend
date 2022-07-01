@@ -2,13 +2,16 @@ package handler
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
+	"os"
 	"strconv"
 
 	"invoiceinaja/auth"
 	"invoiceinaja/domain/client"
 	"invoiceinaja/domain/user"
 	"invoiceinaja/helper"
+	"invoiceinaja/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -73,6 +76,85 @@ func (h *ClientHandler) AddClient(c *gin.Context) {
 
 		c.JSON(http.StatusCreated, res)
 	}
+}
+
+func (h *ClientHandler) AddClientsByCSV(c *gin.Context) {
+	file, err := c.FormFile("csv_file")
+	if err != nil {
+		data := gin.H{"is_uploaded": false}
+		res := helper.ApiResponse("Gagal Mengunggah File!", http.StatusBadRequest, "error", nil, data)
+
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+
+	// didapatkan dari JWT
+	currentUser := c.MustGet("currentUser").(user.User)
+	userId := currentUser.ID
+
+	path := fmt.Sprintf("csv_file/%d-%s", userId, file.Filename)
+
+	errImage := c.SaveUploadedFile(file, path)
+	if errImage != nil {
+		data := gin.H{"unggahan": false}
+		res := helper.ApiResponse("Gagal Mengunggah File!", http.StatusBadRequest, "gagal", nil, data)
+
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+
+	// baca isi file yg sudah berhasil di upload
+	lines, errRead := utils.ReadCsv(path)
+	if errRead != nil {
+		data := gin.H{"unggahan": true}
+		res := helper.ApiResponse("Gagal Membaca File!", http.StatusBadRequest, "gagal", nil, data)
+
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+
+	clients := client.Mapping(lines)
+
+	for _, v := range clients {
+		isEmailAvailable, errAvail := h.clientService.IsEmailClientAvailable(v.Email, currentUser.ID)
+		if errAvail != nil {
+			os.Remove(path)
+			errorMessage := gin.H{"errors": "Server error"}
+			response := helper.ApiResponse("Email checking failed", http.StatusUnprocessableEntity, "gagal", nil, errorMessage)
+			c.JSON(http.StatusUnprocessableEntity, response)
+			return
+		}
+		if !isEmailAvailable {
+			os.Remove(path)
+			data := gin.H{
+				"status": "Gagal Membuat Akun Baru!",
+			}
+			res := helper.ApiResponse("Email "+v.Email+" sudah digunakan!", http.StatusBadRequest, "gagal", nil, data)
+			c.JSON(http.StatusBadRequest, res)
+			return
+		}
+	}
+
+	for _, v := range clients {
+		_, errClient := h.clientService.AddClient(currentUser.ID, v)
+		if errClient != nil {
+			errors := helper.FormatValidationError(errClient)
+			errorMessage := gin.H{"errors": errors}
+
+			response := helper.ApiResponse("Menambahkan Client Baru Gagal!", http.StatusUnprocessableEntity, "error", nil, errorMessage)
+			c.JSON(http.StatusUnprocessableEntity, response)
+			return
+		}
+
+	}
+
+	data := gin.H{
+		"status": "Berhasil Menambahkan Client Baru!",
+	}
+
+	res := helper.ApiResponse("Berhasil Membuat client Baru!", http.StatusCreated, "berhasil", nil, data)
+	os.Remove(path)
+	c.JSON(http.StatusCreated, res)
 }
 
 func (h *ClientHandler) GetClients(c *gin.Context) {

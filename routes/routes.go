@@ -29,6 +29,7 @@ func APIRoutes(router *gin.Engine, userHandler *handler.UserHandler, clientHandl
 
 	// client
 	api.POST("/clients", auth.AuthMiddleware(authService, userService), clientHandler.AddClient)
+	api.POST("/clients_by_csv", auth.AuthMiddleware(authService, userService), clientHandler.AddClientsByCSV)
 	api.GET("/clients", auth.AuthMiddleware(authService, userService), clientHandler.GetClients)
 	api.PUT("/clients/:id", auth.AuthMiddleware(authService, userService), clientHandler.UpdateClient)
 	api.DELETE("/clients/:id", auth.AuthMiddleware(authService, userService), clientHandler.DeleteClient)

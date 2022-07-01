@@ -1,6 +1,9 @@
 package client
 
-import "errors"
+import (
+	"errors"
+	"invoiceinaja/utils"
+)
 
 type IService interface {
 	AddClient(userID int, input InputAddClient) (Client, error)
@@ -115,4 +118,47 @@ func (s *service) DeleteClient(clientID int) (Client, error) {
 	}
 
 	return deleteClient, nil
+}
+
+func Mapping(lines [][]string) []InputAddClient {
+	var clients []InputAddClient
+	var email []string // nampung email
+
+	// Loop through lines & turn into object
+	for i, line := range lines {
+		if i == 0 {
+			continue
+		}
+
+		// mapping data
+		data := InputAddClient{
+			Fullname: line[0],
+			Email:    line[1],
+			Address:  line[2],
+			City:     line[3],
+			ZipCode:  line[4],
+			Company:  line[5],
+		}
+
+		// if email sudah ada pada slice email
+		// email tidak akan diappend kedalam slice email
+		isExist := utils.Contains(email, data.Email)
+		switch isExist {
+		case true:
+			continue
+		case false:
+			email = append(email, data.Email)
+			clients = append(clients, InputAddClient{
+				Fullname: data.Fullname,
+				Email:    data.Email,
+				Address:  data.Address,
+				City:     data.City,
+				ZipCode:  data.ZipCode,
+				Company:  data.Company,
+			})
+		}
+
+	}
+
+	return clients
 }
