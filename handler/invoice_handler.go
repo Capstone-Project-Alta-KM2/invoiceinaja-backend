@@ -192,6 +192,16 @@ func (h *InvoiceHandler) GenerateByCSV(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, res)
 			return
 		}
+
+		client, _ := h.clientService.GetByID(input[i].Invoice.ClientID)
+
+		_, errData := h.invoiceService.SendMailInvoice(newInvoice.ID, currentUser, client)
+		if errData != nil {
+			res := helper.ApiResponse("Send Invoice Has Been Failed", http.StatusBadRequest, "failed", nil, errOrder)
+
+			c.JSON(http.StatusBadRequest, res)
+			return
+		}
 	}
 
 	data := gin.H{"is_recorded": true}
