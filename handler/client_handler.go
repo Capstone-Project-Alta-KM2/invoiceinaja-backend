@@ -107,7 +107,7 @@ func (h *ClientHandler) AddClientsByCSV(c *gin.Context) {
 	lines, errRead := utils.ReadCsv(path)
 	if errRead != nil {
 		data := gin.H{"unggahan": true}
-		res := helper.ApiResponse("Gagal Membaca File!", http.StatusBadRequest, "gagal", nil, data)
+		res := helper.ApiResponse("Failed to Read File!", http.StatusBadRequest, "gagal", nil, data)
 
 		c.JSON(http.StatusBadRequest, res)
 		return
@@ -115,6 +115,7 @@ func (h *ClientHandler) AddClientsByCSV(c *gin.Context) {
 
 	clients := client.Mapping(lines)
 
+	//cek apakah ada email yg sudah terpakai
 	for _, v := range clients {
 		isEmailAvailable, errAvail := h.clientService.IsEmailClientAvailable(v.Email, currentUser.ID)
 		if errAvail != nil {

@@ -28,3 +28,28 @@ type DetailInvoice struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
+
+type DataCSV struct {
+	Name        string
+	Email       string
+	Item        string
+	Price       string
+	Quantity    string
+	InvoiceDate string
+	InvoiceDue  string
+}
+
+type InvoiceCSV struct {
+	ID          int
+	Name        string
+	Email       string
+	Items       []Item
+	InvoiceDate string
+	InvoiceDue  string
+}
+
+type Item struct {
+	ItemName string 
+	Price    int    
+	Quantity int    
+}

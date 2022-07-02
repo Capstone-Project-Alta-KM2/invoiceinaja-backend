@@ -10,6 +10,7 @@ type IService interface {
 	IsEmailClientAvailable(input string, userID int) (bool, error)
 	GetAll(search string, clientID, page int) ([]Client, int, int, error)
 	GetByID(clientID int) (Client, error)
+	GetByEmail(emailClient string, userID int) (Client, error)
 	UpdateClient(input InputUpdate, userID, clientID int) (Client, error)
 	DeleteClient(clientID int) (Client, error)
 }
@@ -72,6 +73,15 @@ func (s *service) GetAll(search string, clientID, page int) ([]Client, int, int,
 
 func (s *service) GetByID(clientID int) (Client, error) {
 	client, err := s.repository.FindById(clientID)
+	if err != nil {
+		return client, err
+	}
+
+	return client, nil
+}
+
+func (s *service) GetByEmail(emailClient string, userID int) (Client, error) {
+	client, err := s.repository.FindByEmail(emailClient, userID)
 	if err != nil {
 		return client, err
 	}

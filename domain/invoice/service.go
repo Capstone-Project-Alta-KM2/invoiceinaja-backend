@@ -4,6 +4,8 @@ import (
 	"errors"
 	"invoiceinaja/domain/client"
 	"invoiceinaja/domain/user"
+	"invoiceinaja/utils"
+	"strconv"
 )
 
 type IService interface {
@@ -97,4 +99,56 @@ func (s *service) SendMailInvoice(invoiceID int, user user.User, client client.C
 	SendMailInvoice(data.Client.Email, data)
 
 	return invoice, nil
+}
+
+func Mapping(lines [][]string) []InvoiceCSV {
+	var inv []InvoiceCSV
+	var email []string // nampung email
+
+	// Loop through lines & turn into object
+	for i, line := range lines {
+		if i == 0 {
+			continue
+		}
+
+		// mapping data
+		data := DataCSV{
+			Name:        line[0],
+			Email:       line[1],
+			Item:        line[2],
+			Price:       line[3],
+			Quantity:    line[4],
+			InvoiceDate: line[5],
+			InvoiceDue:  line[6],
+		}
+
+		// if email sudah ada pada slice email
+		// email tidak akan diappend kedalam slice email
+		isExist := utils.Contains(email, data.Email)
+		switch isExist {
+		case true:
+			var a int
+			for idx, v := range email {
+				if data.Email == v {
+					a = idx
+				}
+			}
+			inv[a].Items = append(inv[a].Items, Item{ItemName: data.Item, Price: ConvStrToInt(data.Price), Quantity: ConvStrToInt(data.Quantity)})
+		case false:
+			email = append(email, data.Email)
+			inv = append(inv, InvoiceCSV{
+				Name:        data.Name,
+				Email:       data.Email,
+				Items:       []Item{{ItemName: data.Item, Price: ConvStrToInt(data.Price), Quantity: ConvStrToInt(data.Quantity)}},
+				InvoiceDate: data.InvoiceDate,
+				InvoiceDue:  data.InvoiceDue,
+			})
+		}
+	}
+	return inv
+}
+
+func ConvStrToInt(data string) int {
+	i, _ := strconv.Atoi(data)
+	return i
 }
