@@ -154,10 +154,6 @@ func (h *InvoiceHandler) GenerateByCSV(c *gin.Context) {
 		}
 	}
 
-	// for _, v := range invoices {
-	// 	fmt.Println(v.ID)
-	// }
-
 	for i, x := range invoices {
 		totalAmount := 0
 		var dtl []invoice.DetailInvoiceData
@@ -198,81 +194,9 @@ func (h *InvoiceHandler) GenerateByCSV(c *gin.Context) {
 		}
 	}
 
-	// ipn := invoice.InputAddInvoice{
-	// 	Invoice: invoice.InvoiceData{
-	// 		ClientID:    49,
-	// 		TotalAmount: 1111110,
-	// 		InvoiceDate: "12-12-2022",
-	// 		InvoiceDue:  "12-12-2022",
-	// 	},
-	// 	DetailInvoice: []invoice.DetailInvoiceData{
-	// 		{
-	// 			ItemName: "A",
-	// 			Price:    1000,
-	// 			Quantity: 1,
-	// 		},
-	// 	},
-	// }
-
-	// for _, z := range input {
-
-	//}
-
 	data := gin.H{"is_recorded": true}
 	res := helper.ApiResponse("Invoices Has Been Created", http.StatusCreated, "success", nil, data)
-	fmt.Println(invoices[0].ID)
 	c.JSON(http.StatusCreated, res)
-
-	// var input []invoice.InputAddInvoice
-
-	// for _, v := range invoices {
-	// 	totalAmount := 0
-	// 	var dtl []invoice.DetailInvoiceData
-
-	// 	for _, x := range v.Items {
-	// 		totalAmount += x.Price * x.Quantity
-	// 	}
-
-	// 	input = append(input, invoice.InputAddInvoice{
-	// 		Invoice: invoice.InvoiceData{
-	// 			ClientID:    v.ID,
-	// 			TotalAmount: totalAmount,
-	// 			InvoiceDate: v.InvoiceDate,
-	// 			InvoiceDue:  v.InvoiceDue,
-	// 		},
-	// 		DetailInvoice: dtl,
-	// 	})
-	// }
-
-	// for _, v := range input {
-	// 	// record data invoice
-	// 	newInvoice, errOrder := h.invoiceService.AddInvoice(v)
-	// 	if errOrder != nil {
-	// 		res := helper.ApiResponse("Add Invoice Has Been Failed", http.StatusBadRequest, "failed", nil, errOrder)
-
-	// 		c.JSON(http.StatusBadRequest, res)
-	// 	}
-
-	// 	// record data detail order
-	// 	_, errDetails := h.invoiceService.SaveDetail(newInvoice.ID, v)
-	// 	if errDetails != nil {
-	// 		res := helper.ApiResponse("Save Data Has Been Failed", http.StatusBadRequest, "failed", nil, errDetails)
-
-	// 		c.JSON(http.StatusBadRequest, res)
-	// 	}
-
-	// _, errData := h.invoiceService.SendMailInvoice(newInvoice.ID, currentUser, newInvoice.Client)
-	// if errData != nil {
-	// 	res := helper.ApiResponse("Send Invoice Has Been Failed", http.StatusBadRequest, "failed", nil, errOrder)
-
-	// 	c.JSON(http.StatusBadRequest, res)
-	// }
-	//}
-
-	// data := gin.H{"is_recorded": true}
-	// res := helper.ApiResponse("Order Has Been Created", http.StatusCreated, "success", nil, data)
-
-	// c.JSON(http.StatusCreated, res)
 }
 
 func (h *InvoiceHandler) GetInvoices(c *gin.Context) {

@@ -14,6 +14,7 @@ type ItemFormatter struct {
 	ItemName string `json:"item_name"`
 	Price    int    `json:"price"`
 	Quantity int    `json:"quantity"`
+	Total    int    `json:"total"`
 }
 
 func FormatInvoice(Invoice Invoice) InvoiceFormatter {
@@ -53,6 +54,7 @@ func FormatItem(item Invoice) []ItemFormatter {
 			ItemName: v.ItemName,
 			Price:    v.Price,
 			Quantity: v.Quantity,
+			Total:    v.Price * v.Quantity,
 		})
 	}
 
