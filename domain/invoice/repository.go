@@ -9,10 +9,7 @@ type IRepository interface {
 	SaveDetail(detail []DetailInvoice) ([]DetailInvoice, error)
 	FindAll(userID int) ([]Invoice, error)
 	FindByID(id int) (Invoice, error)
-	// FindById(id int) (Invoice, error)
-	// FindByEmail(email string) (Invoice, error)
-	// Update(invoice Invoice) (Invoice, error)
-	// Delete(invoice Invoice) (Invoice, error)
+	FindPaid(userID int) (map[string]int, error)
 }
 
 type repository struct {
@@ -66,4 +63,34 @@ func (r *repository) FindByID(id int) (Invoice, error) {
 	}
 
 	return invoice, nil
+}
+
+func (r *repository) FindPaid(userID int) (map[string]int, error) {
+
+	// sql := "SELECT SUM(total_amount) FROM invoices; "
+
+	var invoices []Invoice
+	var invoicesByUser []Invoice
+	result := map[string]int{"paid": 0, "unpaid": 0}
+	err := r.DB.Preload("Client").Preload("Items", "detail_invoices.invoice_id").Order("id desc").Find(&invoices).Error
+	if err != nil {
+		return result, err
+	}
+
+	for _, v := range invoices {
+		if v.Client.UserID == userID {
+			invoicesByUser = append(invoicesByUser, v)
+		}
+	}
+
+	for _, v := range invoicesByUser {
+		if v.Status == "PAID" {
+			result["paid"] += v.TotalAmount
+		}
+		if v.Status == "UNPAID" {
+			result["unpaid"] += v.TotalAmount
+		}
+	}
+
+	return result, nil
 }

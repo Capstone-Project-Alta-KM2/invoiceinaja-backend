@@ -13,7 +13,7 @@ type IService interface {
 	SaveDetail(invoiceID int, input InputAddInvoice) ([]DetailInvoice, error)
 	GetInvoices(userID int) ([]Invoice, error)
 	SendMailInvoice(invoiceID int, user user.User, client client.Client) (Invoice, error)
-	// GetAll(clientID int) ([]Client, error)
+	GetSumStatus(userID int) (map[string]int, error)
 	// GetByID(clientID int) (Client, error)
 	// DeleteClient(clientID int) (Client, error)
 }
@@ -99,6 +99,15 @@ func (s *service) SendMailInvoice(invoiceID int, user user.User, client client.C
 	SendMailInvoice(data.Client.Email, data)
 
 	return invoice, nil
+}
+
+func (s *service) GetSumStatus(userID int) (map[string]int, error) {
+	total, err := s.repository.FindPaid(userID)
+	if err != nil {
+		return total, err
+	}
+
+	return total, nil
 }
 
 func Mapping(lines [][]string) []InvoiceCSV {

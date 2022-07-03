@@ -13,6 +13,7 @@ type IService interface {
 	GetByEmail(emailClient string, userID int) (Client, error)
 	UpdateClient(input InputUpdate, userID, clientID int) (Client, error)
 	DeleteClient(clientID int) (Client, error)
+	TotalCustomer(userID int) int
 }
 
 type service struct {
@@ -128,6 +129,10 @@ func (s *service) DeleteClient(clientID int) (Client, error) {
 	}
 
 	return deleteClient, nil
+}
+
+func (s *service) TotalCustomer(userID int) int {
+	return s.repository.TotalCustomer(userID)
 }
 
 func Mapping(lines [][]string) []InputAddClient {

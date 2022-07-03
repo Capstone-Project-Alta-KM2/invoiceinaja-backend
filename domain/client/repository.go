@@ -11,10 +11,10 @@ type IRepository interface {
 	Save(client Client) (Client, error)
 	FindAll(s string, userID, page, perPage int) ([]Client, int, error)
 	FindById(id int) (Client, error)
-	//FindByName(name string) (Client, error)
 	FindByEmail(email string, userID int) (Client, error)
 	Update(client Client) (Client, error)
 	Delete(client Client) (Client, error)
+	TotalCustomer(userID int) int
 }
 
 type repository struct {
@@ -69,16 +69,8 @@ func (r *repository) FindById(id int) (Client, error) {
 	return client, nil
 }
 
-// func (r *repository) FindByName(name string) (Client, error) {
-// 	var client Client
-// 	sql := "SELECT * FROM clients"
-
-// 	return client, nil
-// }
-
 func (r *repository) FindByEmail(email string, userID int) (Client, error) {
 	var client Client
-
 	err := r.DB.Where("email = ?", email).Where("user_id = ?", userID).Find(&client).Error
 	if err != nil {
 		return client, err
@@ -89,7 +81,6 @@ func (r *repository) FindByEmail(email string, userID int) (Client, error) {
 
 func (r *repository) Update(client Client) (Client, error) {
 	err := r.DB.Save(&client).Error
-
 	if err != nil {
 		return client, err
 	}
@@ -104,4 +95,13 @@ func (r *repository) Delete(client Client) (Client, error) {
 	}
 
 	return client, nil
+}
+
+func (r *repository) TotalCustomer(userID int) int {
+	var total int64
+
+	sql := "SELECT * FROM clients WHERE user_id = " + strconv.Itoa(userID)
+	r.DB.Raw(sql).Count(&total)
+
+	return int(total)
 }

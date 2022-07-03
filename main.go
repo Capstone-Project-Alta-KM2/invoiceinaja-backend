@@ -33,6 +33,8 @@ func main() {
 	invoiceService := invoice.NewUserService(invoiceRepo)
 	invoiceHandler := handler.NewInvoiceHandler(invoiceService, clientService, authService)
 
+	dashboardHandler := handler.NewDashboardHandler(invoiceService, clientService, authService)
+
 	router := gin.Default()
 
 	router.Use(auth.CORSMiddleware())
@@ -43,6 +45,7 @@ func main() {
 		userHandler,
 		clientHandler,
 		invoiceHandler,
+		dashboardHandler,
 		authService,
 		userService,
 	)

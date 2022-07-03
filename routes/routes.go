@@ -10,7 +10,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func APIRoutes(router *gin.Engine, userHandler *handler.UserHandler, clientHandler *handler.ClientHandler, invoiceHandler *handler.InvoiceHandler, authService auth.Service, userService user.IService) {
+func APIRoutes(
+	router *gin.Engine,
+	userHandler *handler.UserHandler,
+	clientHandler *handler.ClientHandler,
+	invoiceHandler *handler.InvoiceHandler,
+	dashboardHandler *handler.DashboardHandler,
+	authService auth.Service,
+	userService user.IService) {
 	router.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "wellcome",
@@ -38,4 +45,7 @@ func APIRoutes(router *gin.Engine, userHandler *handler.UserHandler, clientHandl
 	api.POST("/invoices", auth.AuthMiddleware(authService, userService), invoiceHandler.AddInvoice)
 	api.POST("/invoices_by_csv", auth.AuthMiddleware(authService, userService), invoiceHandler.GenerateByCSV)
 	api.GET("/invoices", auth.AuthMiddleware(authService, userService), invoiceHandler.GetInvoices)
+
+	// daard
+	api.GET("/overall", auth.AuthMiddleware(authService, userService), dashboardHandler.GetDataOverall)
 }
