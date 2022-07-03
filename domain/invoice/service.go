@@ -4,8 +4,10 @@ import (
 	"errors"
 	"invoiceinaja/domain/client"
 	"invoiceinaja/domain/user"
+	"invoiceinaja/helper"
 	"invoiceinaja/utils"
 	"strconv"
+	"time"
 )
 
 type IService interface {
@@ -160,4 +162,78 @@ func Mapping(lines [][]string) []InvoiceCSV {
 func ConvStrToInt(data string) int {
 	i, _ := strconv.Atoi(data)
 	return i
+}
+
+func GraphicInvoice(invoices []Invoice) helper.Month {
+	var s helper.Month
+
+	for _, v := range invoices {
+		x := 0
+		switch {
+		case helper.ConvStingDate(v.InvoiceDue).Month().String() == time.January.String():
+			if v.Status == "PAID" {
+				x += v.TotalAmount
+				s.Jan.Paid += x
+			}
+			if v.Status == "UNPAID" || v.Status == "OVERDUE" {
+				x += v.TotalAmount
+				s.Jan.Unpaid += x
+			}
+		case helper.ConvStingDate(v.InvoiceDue).Month().String() == time.February.String():
+			if v.Status == "PAID" {
+				x += v.TotalAmount
+				s.Feb.Paid += x
+			}
+			if v.Status == "UNPAID" || v.Status == "OVERDUE" {
+				x += v.TotalAmount
+				s.Feb.Unpaid += x
+			}
+		case helper.ConvStingDate(v.InvoiceDue).Month().String() == time.March.String():
+			if v.Status == "PAID" {
+				x += v.TotalAmount
+				s.Mar.Paid += x
+			}
+			if v.Status == "UNPAID" || v.Status == "OVERDUE" {
+				x += v.TotalAmount
+				s.Mar.Unpaid += x
+			}
+		case helper.ConvStingDate(v.InvoiceDue).Month().String() == time.April.String():
+			if v.Status == "PAID" {
+				x += v.TotalAmount
+				s.Apr.Paid += x
+			}
+			if v.Status == "UNPAID" || v.Status == "OVERDUE" {
+				x += v.TotalAmount
+				s.Apr.Unpaid += x
+			}
+		case helper.ConvStingDate(v.InvoiceDue).Month().String() == time.May.String():
+			if v.Status == "PAID" {
+				x += v.TotalAmount
+				s.May.Paid += x
+			}
+			if v.Status == "UNPAID" || v.Status == "OVERDUE" {
+				x += v.TotalAmount
+				s.May.Unpaid += x
+			}
+		case helper.ConvStingDate(v.InvoiceDue).Month().String() == time.June.String():
+			if v.Status == "PAID" {
+				x += v.TotalAmount
+				s.Jun.Paid += x
+			}
+			if v.Status == "UNPAID" || v.Status == "OVERDUE" {
+				x += v.TotalAmount
+				s.Jun.Unpaid += x
+			}
+		case helper.ConvStingDate(v.InvoiceDue).Month().String() == time.July.String():
+			if v.Status == "PAID" {
+				x += v.TotalAmount
+				s.Jul.Paid += x
+			}
+			if v.Status == "UNPAID" || v.Status == "OVERDUE" {
+				x += v.TotalAmount
+				s.Jul.Unpaid += x
+			}
+		}
+	}
+	return s
 }

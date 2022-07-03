@@ -48,4 +48,5 @@ func APIRoutes(
 
 	// daard
 	api.GET("/overall", auth.AuthMiddleware(authService, userService), dashboardHandler.GetDataOverall)
+	api.GET("/graphics", auth.AuthMiddleware(authService, userService), dashboardHandler.GetDataGraphic)
 }

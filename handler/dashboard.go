@@ -38,3 +38,24 @@ func (h *DashboardHandler) GetDataOverall(c *gin.Context) {
 	res := helper.ApiResponse("invoices", http.StatusOK, "success", nil, formatter)
 	c.JSON(http.StatusOK, res)
 }
+
+func (h *DashboardHandler) GetDataGraphic(c *gin.Context) {
+	currentUser := c.MustGet("currentUser").(user.User)
+
+	invoices, err := h.invoiceService.GetInvoices(currentUser.ID)
+	if err != nil {
+		res := helper.ApiResponse("Any Error", http.StatusBadRequest, "failed", nil, err)
+
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+
+	////////////////////////////////
+	s := invoice.GraphicInvoice(invoices)
+
+	//////////////////////////////////
+
+	//formatter := invoice.FormatInvoices(invoices)
+	res := helper.ApiResponse("invoices", http.StatusOK, "success", nil, s)
+	c.JSON(http.StatusOK, res)
+}
