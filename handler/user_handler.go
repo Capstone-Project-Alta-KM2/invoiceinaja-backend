@@ -68,6 +68,17 @@ func (h *UserHandler) UserRegister(c *gin.Context) {
 
 		otp, _ := password.Generate(4, 4, 0, true, true)
 
+		var a string
+		message := utils.SendMailOTP(input.Email, otp)
+		for _, v := range message.ResultsV31 {
+			a = v.Status
+		}
+		if a != "success" {
+			res := errors.New("failed send email")
+			c.JSON(http.StatusCreated, res)
+			return
+		}
+
 		data := gin.H{
 			"status":   "Successfully Created New Account!",
 			"token":    token,
