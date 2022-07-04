@@ -28,7 +28,8 @@ func APIRoutes(
 
 	// user
 	api.POST("/users", userHandler.UserRegister)
-	//api.POST("/email_checkers", userHandler.CheckEmailAvailability)
+	api.GET("/resend_otp", auth.AuthMiddleware(authService, userService), userHandler.ResendOTP)
+	api.POST("/email_checkers", userHandler.CheckEmailAvailability)
 	api.POST("/sessions", userHandler.Login)
 	api.POST("/avatars", auth.AuthMiddleware(authService, userService), userHandler.UploadAvatar)
 	api.PUT("/users", auth.AuthMiddleware(authService, userService), userHandler.UpdateUser)

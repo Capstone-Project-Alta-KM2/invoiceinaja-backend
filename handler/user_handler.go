@@ -1,14 +1,17 @@
 package handler
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 
 	"invoiceinaja/auth"
 	"invoiceinaja/domain/user"
 	"invoiceinaja/helper"
+	"invoiceinaja/utils"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sethvargo/go-password/password"
 )
 
 type UserHandler struct {
@@ -47,7 +50,7 @@ func (h *UserHandler) UserRegister(c *gin.Context) {
 		res := helper.ApiResponse("Email already used!", http.StatusBadRequest, "failed", nil, data)
 		c.JSON(http.StatusBadRequest, res)
 	} else {
-		_, errUser := h.userService.Register(input)
+		user, errUser := h.userService.Register(input)
 		if errUser != nil {
 			res := helper.ApiResponse("Data Input Failed!", http.StatusBadRequest, "failed", nil, errUser)
 
@@ -55,8 +58,20 @@ func (h *UserHandler) UserRegister(c *gin.Context) {
 			return
 		}
 
+		token, errToken := h.authService.GenerateTokenJWT(user.ID, user.Fullname, user.Role)
+		if errToken != nil {
+			res := helper.ApiResponse("Failed to generate Token", http.StatusBadRequest, "failed", nil, nil)
+
+			c.JSON(http.StatusBadRequest, res)
+			return
+		}
+
+		otp, _ := password.Generate(4, 4, 0, true, true)
+
 		data := gin.H{
-			"status": "Successfully Created New Account!",
+			"status":   "Successfully Created New Account!",
+			"token":    token,
+			"code_otp": otp,
 		}
 
 		res := helper.ApiResponse("Successfully Created New Account!", http.StatusCreated, "success", nil, data)
@@ -122,7 +137,6 @@ func (h *UserHandler) Login(c *gin.Context) {
 	}
 
 	token, errToken := h.authService.GenerateTokenJWT(loginUser.ID, loginUser.Fullname, loginUser.Role)
-
 	if errToken != nil {
 		res := helper.ApiResponse("Failed to generate Token", http.StatusBadRequest, "failed", nil, nil)
 
@@ -266,7 +280,33 @@ func (h *UserHandler) ResetPassword(c *gin.Context) {
 	}
 
 	data := gin.H{
-		"is_sent": true,
+		"is_send": true,
+	}
+
+	res := helper.ApiResponse("Please Check Your Email", http.StatusOK, "success", nil, data)
+
+	c.JSON(http.StatusCreated, res)
+}
+
+func (h *UserHandler) ResendOTP(c *gin.Context) {
+	// didapatkan dari JWT
+	currentUser := c.MustGet("currentUser").(user.User)
+	otp, _ := password.Generate(4, 4, 0, true, true)
+
+	var a string
+	message := utils.SendMailOTP(currentUser.Email, otp)
+	for _, v := range message.ResultsV31 {
+		a = v.Status
+	}
+	if a != "success" {
+		res := errors.New("failed send email")
+		c.JSON(http.StatusCreated, res)
+		return
+	}
+
+	data := gin.H{
+		"is_send":  true,
+		"code_otp": otp,
 	}
 
 	res := helper.ApiResponse("Please Check Your Email", http.StatusOK, "success", nil, data)
