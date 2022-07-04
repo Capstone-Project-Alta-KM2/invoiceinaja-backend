@@ -1,9 +1,11 @@
 package handler
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
+	"strconv"
 
 	"invoiceinaja/auth"
 	"invoiceinaja/domain/client"
@@ -223,5 +225,74 @@ func (h *InvoiceHandler) GetInvoices(c *gin.Context) {
 
 	formatter := invoice.FormatInvoices(invoices)
 	res := helper.ApiResponse("invoices", http.StatusCreated, "success", nil, formatter)
+	c.JSON(http.StatusCreated, res)
+}
+
+func (h *InvoiceHandler) DeleteInvoice(c *gin.Context) {
+	id, _ := strconv.Atoi(c.Param("id"))
+
+	// cek apakah yg akses adalah user benar
+	currentUser := c.MustGet("currentUser").(user.User)
+
+	invoice, err := h.invoiceService.GetByID(id)
+	if err != nil {
+		res := helper.ApiResponse("Invoice Not Found", http.StatusBadRequest, "failed", nil, err)
+
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+
+	details, errDetail := h.invoiceService.GetDetailByID(invoice.ID)
+	if errDetail != nil {
+		res := helper.ApiResponse("Invoice Not Found", http.StatusBadRequest, "failed", nil, err)
+
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+
+	for _, v := range details {
+		h.invoiceService.DeleteDetailInvoice(v)
+	}
+
+	if invoice.ID == 0 {
+		res := helper.ApiResponse("Invoice Not Found", http.StatusBadRequest, "failed", nil, err)
+
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+
+	if currentUser.ID != invoice.Client.UserID {
+		res := helper.ApiResponse("Failed to Delete Invoice", http.StatusBadRequest, "failed", nil, errors.New("you don't have access"))
+
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+
+	_, errDel := h.invoiceService.DeleteInvoice(invoice.ID)
+	if errDel != nil {
+		res := helper.ApiResponse("Invoice Not Found", http.StatusBadRequest, "failed", nil, errDel)
+
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+
+	cekItem, errCek := h.invoiceService.GetByID(id)
+	if errCek != nil {
+		res := helper.ApiResponse("Any Error", http.StatusBadRequest, "failed", nil, errCek)
+
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+
+	if cekItem.ID == 0 {
+		res := helper.ApiResponse("Successfuly Delete Invoice", http.StatusOK, "success", nil, nil)
+
+		c.JSON(http.StatusOK, res)
+		return
+	}
+
+	data := gin.H{"is_deleted": true}
+	res := helper.ApiResponse("Any Error", http.StatusBadRequest, "failed", nil, data)
+
 	c.JSON(http.StatusCreated, res)
 }

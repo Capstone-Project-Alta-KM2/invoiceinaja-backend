@@ -9,7 +9,10 @@ type IRepository interface {
 	SaveDetail(detail []DetailInvoice) ([]DetailInvoice, error)
 	FindAll(userID int) ([]Invoice, error)
 	FindByID(id int) (Invoice, error)
+	FindAllDetail(invoiceID int) ([]DetailInvoice, error)
 	FindPaid(userID int) (map[string]int, error)
+	DeleteInvoice(invoice Invoice) (Invoice, error)
+	DeleteDetailInvoice(detailInvoice DetailInvoice) (DetailInvoice, error)
 }
 
 type repository struct {
@@ -66,9 +69,6 @@ func (r *repository) FindByID(id int) (Invoice, error) {
 }
 
 func (r *repository) FindPaid(userID int) (map[string]int, error) {
-
-	// sql := "SELECT SUM(total_amount) FROM invoices; "
-
 	var invoices []Invoice
 	var invoicesByUser []Invoice
 	result := map[string]int{"paid": 0, "unpaid": 0}
@@ -93,4 +93,32 @@ func (r *repository) FindPaid(userID int) (map[string]int, error) {
 	}
 
 	return result, nil
+}
+
+func (r *repository) FindAllDetail(invoiceID int) ([]DetailInvoice, error) {
+	var detail []DetailInvoice
+	err := r.DB.Where("invoice_id = ?", invoiceID).Find(&detail).Error
+	if err != nil {
+		return detail, err
+	}
+
+	return detail, nil
+}
+
+func (r *repository) DeleteInvoice(invoice Invoice) (Invoice, error) {
+	err := r.DB.Delete(&invoice).Error
+	if err != nil {
+		return invoice, err
+	}
+
+	return invoice, nil
+}
+
+func (r *repository) DeleteDetailInvoice(detailInvoice DetailInvoice) (DetailInvoice, error) {
+	err := r.DB.Delete(&detailInvoice).Error
+	if err != nil {
+		return detailInvoice, err
+	}
+
+	return detailInvoice, nil
 }

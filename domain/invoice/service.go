@@ -16,8 +16,10 @@ type IService interface {
 	GetInvoices(userID int) ([]Invoice, error)
 	SendMailInvoice(invoiceID int, user user.User, client client.Client) (Invoice, error)
 	GetSumStatus(userID int) (map[string]int, error)
-	// GetByID(clientID int) (Client, error)
-	// DeleteClient(clientID int) (Client, error)
+	GetByID(invoiceID int) (Invoice, error)
+	GetDetailByID(invoiceID int) ([]DetailInvoice, error)
+	DeleteInvoice(invoiceID int) (Invoice, error)
+	DeleteDetailInvoice(detailInvoice DetailInvoice) (DetailInvoice, error)
 }
 
 type service struct {
@@ -62,12 +64,53 @@ func (s *service) SaveDetail(invoiceID int, input InputAddInvoice) ([]DetailInvo
 }
 
 func (s *service) GetInvoices(userID int) ([]Invoice, error) {
-	clients, err := s.repository.FindAll(userID)
+	invoices, err := s.repository.FindAll(userID)
 	if err != nil {
-		return clients, err
+		return invoices, err
 	}
 
-	return clients, nil
+	return invoices, nil
+}
+
+func (s *service) GetByID(invoiceID int) (Invoice, error) {
+	invoice, err := s.repository.FindByID(invoiceID)
+	if err != nil {
+		return invoice, err
+	}
+
+	return invoice, nil
+}
+
+func (s *service) GetDetailByID(invoiceID int) ([]DetailInvoice, error) {
+	details, err := s.repository.FindAllDetail(invoiceID)
+	if err != nil {
+		return details, err
+	}
+
+	return details, nil
+}
+
+func (s *service) DeleteInvoice(invoiceID int) (Invoice, error) {
+	invoice, err := s.repository.FindByID(invoiceID)
+	if err != nil {
+		return invoice, err
+	}
+
+	deleteInvoice, errDel := s.repository.DeleteInvoice(invoice)
+	if errDel != nil {
+		return deleteInvoice, errDel
+	}
+
+	return deleteInvoice, nil
+}
+
+func (s *service) DeleteDetailInvoice(detailInvoice DetailInvoice) (DetailInvoice, error) {
+	deleteInvoice, errDel := s.repository.DeleteDetailInvoice(detailInvoice)
+	if errDel != nil {
+		return deleteInvoice, errDel
+	}
+
+	return deleteInvoice, nil
 }
 
 func (s *service) SendMailInvoice(invoiceID int, user user.User, client client.Client) (Invoice, error) {
