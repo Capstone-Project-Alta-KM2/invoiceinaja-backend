@@ -23,3 +23,8 @@ type InputUpdate struct {
 	NoTlpn       string `json:"phone_number" binding:"required"`
 	BusinessName string `json:"company" binding:"required"`
 }
+
+type InputChangePassword struct {
+	OldPassword string `json:"old_password" binding:"required"`
+	NewPassword string `json:"new_password" binding:"required"`
+}

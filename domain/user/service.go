@@ -15,6 +15,7 @@ type IService interface {
 	IsEmailAvailable(input InputCheckEmail) (bool, error)
 	SaveAvatar(id int, fileLocation string) (User, error)
 	UpdateUser(id int, input InputUpdate) (User, error)
+	ChangePassword(input InputChangePassword, userID int) (bool, error)
 	ResetPassword(input InputCheckEmail) (User, error)
 }
 
@@ -143,6 +144,32 @@ func (s *service) UpdateUser(id int, input InputUpdate) (User, error) {
 	}
 
 	return updatedUser, nil
+}
+
+func (s *service) ChangePassword(input InputChangePassword, userID int) (bool, error) {
+	user, err := s.repository.FindById(userID)
+	if err != nil {
+		return false, err
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(input.OldPassword))
+	if err != nil {
+		return false, err
+	}
+
+	//enkripsi password
+	passwordHash, errHash := bcrypt.GenerateFromPassword([]byte(input.NewPassword), bcrypt.MinCost)
+	if errHash != nil {
+		return false, errHash
+	}
+	user.Password = string(passwordHash)
+
+	_, err = s.repository.Update(user)
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }
 
 func (s *service) ResetPassword(input InputCheckEmail) (User, error) {

@@ -32,6 +32,7 @@ func APIRoutes(
 	api.POST("/sessions", userHandler.Login)
 	api.POST("/avatars", auth.AuthMiddleware(authService, userService), userHandler.UploadAvatar)
 	api.PUT("/users", auth.AuthMiddleware(authService, userService), userHandler.UpdateUser)
+	api.POST("/change_passwords", auth.AuthMiddleware(authService, userService), userHandler.ChangePassword)
 	api.POST("/reset_passwords", userHandler.ResetPassword)
 
 	// client

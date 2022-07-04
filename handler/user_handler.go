@@ -208,6 +208,37 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 	c.JSON(http.StatusCreated, res)
 }
 
+func (h *UserHandler) ChangePassword(c *gin.Context) {
+	// cek yg akses login
+	currentUser := c.MustGet("currentUser").(user.User)
+	userId := currentUser.ID
+
+	var input user.InputChangePassword
+	err := c.ShouldBindJSON(&input)
+	if err != nil {
+		errors := helper.FormatValidationError(err)
+		errorMessage := gin.H{"errors": errors}
+
+		response := helper.ApiResponse("Change Password Failed", http.StatusUnprocessableEntity, "error", nil, errorMessage)
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	_, errUpdate := h.userService.ChangePassword(input, userId)
+	if errUpdate != nil {
+		res := helper.ApiResponse("Change Password Failed", http.StatusUnprocessableEntity, "failed", nil, err)
+
+		c.JSON(http.StatusUnprocessableEntity, res)
+		return
+	}
+
+	data := gin.H{"is_changed": true}
+	res := helper.ApiResponse("Successfully Change Password!", http.StatusCreated, "success", nil, data)
+
+	c.JSON(http.StatusCreated, res)
+
+}
+
 func (h *UserHandler) ResetPassword(c *gin.Context) {
 	var input user.InputCheckEmail
 	err := c.ShouldBindJSON(&input)
