@@ -20,7 +20,7 @@ func APIRoutes(
 	userService user.IService) {
 	router.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
-			"message": "wellcome",
+			"message": "Wellcome to InvoiceinAja",
 		})
 	})
 
