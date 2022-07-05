@@ -82,7 +82,7 @@ func (h *ClientHandler) AddClientsByCSV(c *gin.Context) {
 	file, err := c.FormFile("csv_file")
 	if err != nil {
 		data := gin.H{"is_uploaded": false}
-		res := helper.ApiResponse("Gagal Mengunggah File!", http.StatusBadRequest, "error", nil, data)
+		res := helper.ApiResponse("Failed Upload File!", http.StatusBadRequest, "error", nil, data)
 
 		c.JSON(http.StatusBadRequest, res)
 		return
@@ -97,7 +97,7 @@ func (h *ClientHandler) AddClientsByCSV(c *gin.Context) {
 	errImage := c.SaveUploadedFile(file, path)
 	if errImage != nil {
 		data := gin.H{"unggahan": false}
-		res := helper.ApiResponse("Gagal Mengunggah File!", http.StatusBadRequest, "gagal", nil, data)
+		res := helper.ApiResponse("Failed Upload File!", http.StatusBadRequest, "failed", nil, data)
 
 		c.JSON(http.StatusBadRequest, res)
 		return
@@ -107,7 +107,7 @@ func (h *ClientHandler) AddClientsByCSV(c *gin.Context) {
 	lines, errRead := utils.ReadCsv(path)
 	if errRead != nil {
 		data := gin.H{"unggahan": true}
-		res := helper.ApiResponse("Failed to Read File!", http.StatusBadRequest, "gagal", nil, data)
+		res := helper.ApiResponse("Failed to Read File!", http.StatusBadRequest, "failed", nil, data)
 
 		c.JSON(http.StatusBadRequest, res)
 		return
@@ -121,16 +121,16 @@ func (h *ClientHandler) AddClientsByCSV(c *gin.Context) {
 		if errAvail != nil {
 			os.Remove(path)
 			errorMessage := gin.H{"errors": "Server error"}
-			response := helper.ApiResponse("Email checking failed", http.StatusUnprocessableEntity, "gagal", nil, errorMessage)
+			response := helper.ApiResponse("Email checking failed", http.StatusUnprocessableEntity, "failed", nil, errorMessage)
 			c.JSON(http.StatusUnprocessableEntity, response)
 			return
 		}
 		if !isEmailAvailable {
 			os.Remove(path)
 			data := gin.H{
-				"status": "Gagal Membuat Akun Baru!",
+				"status": "Failed Add Client!",
 			}
-			res := helper.ApiResponse("Email "+v.Email+" sudah digunakan!", http.StatusBadRequest, "gagal", nil, data)
+			res := helper.ApiResponse("Email "+v.Email+" Used!", http.StatusBadRequest, "failed", nil, data)
 			c.JSON(http.StatusBadRequest, res)
 			return
 		}
@@ -142,7 +142,7 @@ func (h *ClientHandler) AddClientsByCSV(c *gin.Context) {
 			errors := helper.FormatValidationError(errClient)
 			errorMessage := gin.H{"errors": errors}
 
-			response := helper.ApiResponse("Menambahkan Client Baru Gagal!", http.StatusUnprocessableEntity, "error", nil, errorMessage)
+			response := helper.ApiResponse("Failed Add Client!", http.StatusUnprocessableEntity, "error", nil, errorMessage)
 			c.JSON(http.StatusUnprocessableEntity, response)
 			return
 		}
@@ -150,10 +150,10 @@ func (h *ClientHandler) AddClientsByCSV(c *gin.Context) {
 	}
 
 	data := gin.H{
-		"status": "Berhasil Menambahkan Client Baru!",
+		"status": "Successfuly Add Client!",
 	}
 
-	res := helper.ApiResponse("Berhasil Membuat client Baru!", http.StatusCreated, "berhasil", nil, data)
+	res := helper.ApiResponse("Successfuly Add Client!", http.StatusCreated, "success", nil, data)
 	os.Remove(path)
 	c.JSON(http.StatusCreated, res)
 }
