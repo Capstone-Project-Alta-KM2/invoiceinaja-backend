@@ -26,8 +26,8 @@ func InitConfiguration() Config {
 		DB_PORT:        GetOrDefault("DB_PORT", "3306"),
 		DB_HOST:        GetOrDefault("DB_HOST", "aws-capstone.cd72sjq0y6mo.ap-southeast-1.rds.amazonaws.com"),
 		JWT_KEY:        GetOrDefault("JWT_KEY", "FuFuFuFu"),
-		VT_SERVER_KEY:  GetOrDefault("VT_SERVER_KEY", "VT_SERVER_KEY"),
-		VT_CLIENT_KEY:  GetOrDefault("VT_CLIENT_KEY", "VT_CLIENT_KEY"),
+		VT_SERVER_KEY:  GetOrDefault("VT_SERVER_KEY", "SB-Mid-server-2klUh5evIn6sr5A1YZdPcNNm"),
+		VT_CLIENT_KEY:  GetOrDefault("VT_CLIENT_KEY", "SB-Mid-client-fSTcdHfgSqznZ4kO"),
 	}
 }
 

@@ -296,3 +296,7 @@ func (h *InvoiceHandler) DeleteInvoice(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, res)
 }
+
+func (h *InvoiceHandler) InvoicePay(c *gin.Context) {
+
+}
