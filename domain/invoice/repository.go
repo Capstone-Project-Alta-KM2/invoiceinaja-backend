@@ -13,6 +13,7 @@ type IRepository interface {
 	FindPaid(userID int) (map[string]int, error)
 	DeleteInvoice(invoice Invoice) (Invoice, error)
 	DeleteDetailInvoice(detailInvoice DetailInvoice) (DetailInvoice, error)
+	UpdateInvoice(invoice Invoice) (Invoice, error)
 }
 
 type repository struct {
@@ -121,4 +122,13 @@ func (r *repository) DeleteDetailInvoice(detailInvoice DetailInvoice) (DetailInv
 	}
 
 	return detailInvoice, nil
+}
+
+func (r *repository) UpdateInvoice(invoice Invoice) (Invoice, error) {
+	err := r.DB.Save(&invoice).Error
+	if err != nil {
+		return invoice, err
+	}
+
+	return invoice, nil
 }

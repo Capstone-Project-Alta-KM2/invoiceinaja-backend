@@ -2,14 +2,14 @@ package payment
 
 import (
 	"invoiceinaja/config"
-	"invoiceinaja/domain/user"
+	"invoiceinaja/domain/client"
 	"strconv"
 
 	midtrans "github.com/veritrans/go-midtrans"
 )
 
 type Service interface {
-	GetPaymentUrl(transaction Transaction, user user.User) (string, error)
+	GetPaymentUrl(transaction Transaction, client client.Client) (string, error)
 }
 
 type service struct {
@@ -19,7 +19,7 @@ func NewService() *service {
 	return &service{}
 }
 
-func (s *service) GetPaymentUrl(transaction Transaction, user user.User) (string, error) {
+func (s *service) GetPaymentUrl(transaction Transaction, client client.Client) (string, error) {
 	midclient := midtrans.NewClient()
 	midclient.ServerKey = config.InitConfiguration().VT_SERVER_KEY
 	midclient.ClientKey = config.InitConfiguration().VT_CLIENT_KEY
@@ -31,8 +31,8 @@ func (s *service) GetPaymentUrl(transaction Transaction, user user.User) (string
 
 	snapReq := &midtrans.SnapReq{
 		CustomerDetail: &midtrans.CustDetail{
-			Email: user.Email,
-			FName: user.Fullname,
+			Email: client.Email,
+			FName: client.Fullname,
 		},
 		TransactionDetails: midtrans.TransactionDetails{
 			OrderID:  strconv.Itoa(transaction.ID),

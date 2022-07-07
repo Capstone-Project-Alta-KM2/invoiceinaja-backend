@@ -3,6 +3,7 @@ package invoice
 import (
 	"errors"
 	"invoiceinaja/domain/client"
+	"invoiceinaja/domain/payment"
 	"invoiceinaja/domain/user"
 	"invoiceinaja/helper"
 	"invoiceinaja/utils"
@@ -20,14 +21,17 @@ type IService interface {
 	GetDetailByID(invoiceID int) ([]DetailInvoice, error)
 	DeleteInvoice(invoiceID int) (Invoice, error)
 	DeleteDetailInvoice(detailInvoice DetailInvoice) (DetailInvoice, error)
+	PayInvoice(input payment.InputCreateTansaction, client client.Client) (string, error)
+	UpdateInvoice(invoice Invoice, urlPayment string) (Invoice, error)
 }
 
 type service struct {
-	repository IRepository
+	repository     IRepository
+	paymentService payment.Service
 }
 
-func NewUserService(repository IRepository) *service {
-	return &service{repository}
+func NewUserService(repository IRepository, paymentService payment.Service) *service {
+	return &service{repository, paymentService}
 }
 
 func (s *service) AddInvoice(input InputAddInvoice) (Invoice, error) {
@@ -153,6 +157,31 @@ func (s *service) GetSumStatus(userID int) (map[string]int, error) {
 	}
 
 	return total, nil
+}
+
+func (s *service) UpdateInvoice(invoice Invoice, urlPayment string) (Invoice, error) {
+	invoice.PaymentURL = urlPayment
+
+	updatedItem, errUpdate := s.repository.UpdateInvoice(invoice)
+	if errUpdate != nil {
+		return updatedItem, errUpdate
+	}
+
+	return updatedItem, nil
+}
+
+func (s *service) PayInvoice(input payment.InputCreateTansaction, client client.Client) (string, error) {
+	paymentTransaction := payment.Transaction{
+		ID:     input.InvoiceID,
+		Amount: input.TotalAmount,
+	}
+
+	urlPayment, err := s.paymentService.GetPaymentUrl(paymentTransaction, client)
+	if err != nil {
+		return urlPayment, err
+	}
+
+	return urlPayment, nil
 }
 
 func Mapping(lines [][]string) []InvoiceCSV {

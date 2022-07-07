@@ -5,6 +5,7 @@ import (
 	"invoiceinaja/config"
 	"invoiceinaja/database"
 	"invoiceinaja/domain/client"
+	"invoiceinaja/domain/payment"
 
 	"github.com/gin-gonic/gin"
 
@@ -29,8 +30,9 @@ func main() {
 	clientService := client.NewUserService(clientRepo)
 	clientHandler := handler.NewClientHandler(clientService, userService, authService)
 
+	paymentService := payment.NewService()
 	invoiceRepo := invoice.NewInvoiceRepository(db)
-	invoiceService := invoice.NewUserService(invoiceRepo)
+	invoiceService := invoice.NewUserService(invoiceRepo, paymentService)
 	invoiceHandler := handler.NewInvoiceHandler(invoiceService, clientService, authService)
 
 	dashboardHandler := handler.NewDashboardHandler(invoiceService, clientService, authService)

@@ -10,6 +10,8 @@ import (
 	"invoiceinaja/auth"
 	"invoiceinaja/domain/client"
 	"invoiceinaja/domain/invoice"
+
+	"invoiceinaja/domain/payment"
 	"invoiceinaja/domain/user"
 	"invoiceinaja/helper"
 	"invoiceinaja/utils"
@@ -228,6 +230,31 @@ func (h *InvoiceHandler) GetInvoices(c *gin.Context) {
 	c.JSON(http.StatusCreated, res)
 }
 
+func (h *InvoiceHandler) GetInvoicesByID(c *gin.Context) {
+	id, _ := strconv.Atoi(c.Param("id"))
+
+	// didapatkan dari JWT
+	currentUser := c.MustGet("currentUser").(user.User)
+
+	invoices, err := h.invoiceService.GetByID(id)
+	if err != nil {
+		res := helper.ApiResponse("Invoice Not Found", http.StatusNotFound, "failed", nil, err)
+
+		c.JSON(http.StatusNotFound, res)
+		return
+	}
+	if invoices.Client.ID != currentUser.ID {
+		res := helper.ApiResponse("Invoice Not Found", http.StatusNotFound, "failed", nil, err)
+
+		c.JSON(http.StatusNotFound, res)
+		return
+	}
+
+	formatter := invoice.FormatInvoice(invoices)
+	res := helper.ApiResponse("invoices", http.StatusOK, "success", nil, formatter)
+	c.JSON(http.StatusOK, res)
+}
+
 func (h *InvoiceHandler) DeleteInvoice(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
 
@@ -276,27 +303,73 @@ func (h *InvoiceHandler) DeleteInvoice(c *gin.Context) {
 		return
 	}
 
-	cekItem, errCek := h.invoiceService.GetByID(id)
+	cekInvoice, errCek := h.invoiceService.GetByID(id)
 	if errCek != nil {
-		res := helper.ApiResponse("Any Error", http.StatusBadRequest, "failed", nil, errCek)
+		res := helper.ApiResponse("Failed to Delete Invoice", http.StatusBadRequest, "failed", nil, errCek)
 
 		c.JSON(http.StatusBadRequest, res)
 		return
 	}
 
-	if cekItem.ID == 0 {
-		res := helper.ApiResponse("Successfuly Delete Invoice", http.StatusOK, "success", nil, nil)
+	if cekInvoice.ID != 0 {
+		res := helper.ApiResponse("Failed to Delete Invoice", http.StatusOK, "failed", nil, nil)
 
 		c.JSON(http.StatusOK, res)
 		return
 	}
 
 	data := gin.H{"is_deleted": true}
-	res := helper.ApiResponse("Any Error", http.StatusBadRequest, "failed", nil, data)
+	res := helper.ApiResponse("Successfuly Delete Invoice", http.StatusBadRequest, "success", nil, data)
 
 	c.JSON(http.StatusCreated, res)
 }
 
 func (h *InvoiceHandler) InvoicePay(c *gin.Context) {
+	// get Invoice Id, total amount and
+	var input payment.InputCreateTansaction
 
+	err := c.ShouldBindJSON(&input)
+	if err != nil {
+		errors := helper.FormatValidationError(err)
+		errMessage := gin.H{"errors": errors}
+
+		res := helper.ApiResponse("Failed to Create Transaction", http.StatusUnprocessableEntity, "failed", nil, errMessage)
+		c.JSON(http.StatusUnprocessableEntity, res)
+		return
+	}
+
+	// currentUser := c.MustGet("currentUser").(user.User)
+
+	invoice, errInv := h.invoiceService.GetByID(input.InvoiceID)
+	if errInv != nil {
+		res := helper.ApiResponse("Invoice Not Found", http.StatusBadRequest, "failed", nil, err)
+
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+	// if invoice.Client.UserID != currentUser.ID {
+	// 	res := helper.ApiResponse("Invoice Not Found", http.StatusBadRequest, "failed", nil, err)
+
+	// 	c.JSON(http.StatusBadRequest, res)
+	// 	return
+	// }
+
+	url, errTrans := h.invoiceService.PayInvoice(input, invoice.Client)
+	if errTrans != nil {
+		res := helper.ApiResponse("Failed to Create Transaction", http.StatusUnprocessableEntity, "failed", nil, errTrans)
+		c.JSON(http.StatusUnprocessableEntity, res)
+		return
+	}
+
+	_, errUpdate := h.invoiceService.UpdateInvoice(invoice, url)
+	if errUpdate != nil {
+		res := helper.ApiResponse("Failed to Create Transaction", http.StatusUnprocessableEntity, "failed", nil, errTrans)
+		c.JSON(http.StatusUnprocessableEntity, res)
+		return
+	}
+
+	data := gin.H{"payment_url": url}
+	res := helper.ApiResponse("Successfuly Create Payment URL", http.StatusOK, "success", nil, data)
+
+	c.JSON(http.StatusOK, res)
 }

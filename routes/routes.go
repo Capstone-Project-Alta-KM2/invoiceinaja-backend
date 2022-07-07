@@ -47,8 +47,9 @@ func APIRoutes(
 	api.POST("/invoices", auth.AuthMiddleware(authService, userService), invoiceHandler.AddInvoice)
 	api.POST("/invoices_by_csv", auth.AuthMiddleware(authService, userService), invoiceHandler.GenerateByCSV)
 	api.GET("/invoices", auth.AuthMiddleware(authService, userService), invoiceHandler.GetInvoices)
+	api.GET("/invoices/:id", auth.AuthMiddleware(authService, userService), invoiceHandler.GetInvoicesByID)
 	api.DELETE("/invoices/:id", auth.AuthMiddleware(authService, userService), invoiceHandler.DeleteInvoice)
-	api.POST("/invoice_pay", invoiceHandler.InvoicePay)
+	api.POST("/invoice_payments", invoiceHandler.InvoicePay)
 
 	// daard
 	api.GET("/overall", auth.AuthMiddleware(authService, userService), dashboardHandler.GetDataOverall)
