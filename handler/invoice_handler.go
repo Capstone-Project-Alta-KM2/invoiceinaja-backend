@@ -243,7 +243,7 @@ func (h *InvoiceHandler) GetInvoicesByID(c *gin.Context) {
 		c.JSON(http.StatusNotFound, res)
 		return
 	}
-	if invoices.Client.ID != currentUser.ID {
+	if invoices.Client.UserID != currentUser.ID {
 		res := helper.ApiResponse("Invoice Not Found", http.StatusNotFound, "failed", nil, err)
 
 		c.JSON(http.StatusNotFound, res)
