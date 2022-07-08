@@ -97,7 +97,7 @@ func (r *repository) Delete(client Client) (Client, error) {
 func (r *repository) TotalCustomer(userID int) int {
 	var total int64
 
-	sql := "SELECT * FROM clients WHERE user_id = " + strconv.Itoa(userID)
+	sql := "SELECT * FROM clients WHERE deleted_at IS NULL and user_id = " + strconv.Itoa(userID)
 	r.DB.Raw(sql).Count(&total)
 
 	return int(total)
