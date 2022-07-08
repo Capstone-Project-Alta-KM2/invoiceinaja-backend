@@ -4,6 +4,8 @@ import (
 	"time"
 
 	"invoiceinaja/domain/user"
+
+	"gorm.io/gorm"
 )
 
 type Client struct {
@@ -18,4 +20,5 @@ type Client struct {
 	User      user.User `gorm:"foreignKey:UserID;not null"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt
 }

@@ -2,6 +2,7 @@ package user
 
 import (
 	"errors"
+	"strconv"
 
 	utl "invoiceinaja/utils"
 
@@ -185,11 +186,8 @@ func (s *service) ResetPassword(input InputCheckEmail) (User, error) {
 	}
 
 	// generate password
-	newPassword := utl.RandomString(12)
-	// newPassword, err := password.Generate(10, 10, 0, true, true)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
+	randomString := utl.RandomString(12)
+	newPassword := randomString + strconv.Itoa(user.ID)
 
 	//enkripsi password
 	passwordHash, _ := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.MinCost)
