@@ -35,7 +35,7 @@ func SendMailResetPassword(destination, newPassword string) *mailjet.ResultsV31 
 	return res
 }
 
-func SendMailOTP(destination, newPassword string) *mailjet.ResultsV31 {
+func SendMailOTP(destination, otp string) *mailjet.ResultsV31 {
 	mailjetClient := mailjet.NewMailjetClient("5f4b8dba26ef85efb6dce6410157bbe9", "efd86ba2c3502512da935ad19de63869")
 	messagesInfo := []mailjet.InfoMessagesV31{
 		{
@@ -49,10 +49,10 @@ func SendMailOTP(destination, newPassword string) *mailjet.ResultsV31 {
 					Name:  destination,
 				},
 			},
-			TemplateID:       4035911,
+			TemplateID:       4061702,
 			TemplateLanguage: true,
-			Subject:          "Reset Password InvoiceinAja",
-			Variables:        map[string]interface{}{"new_password": newPassword},
+			Subject:          "OTP Code InvoiceinAja",
+			Variables:        map[string]interface{}{"code": otp},
 		},
 	}
 	messages := mailjet.MessagesV31{Info: messagesInfo}
