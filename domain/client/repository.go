@@ -35,13 +35,10 @@ func (r *repository) Save(client Client) (Client, error) {
 }
 
 func (r *repository) FindAll(s string, userID, page, perPage int) ([]Client, int, error) {
-	//page, _ := strconv.Atoi(c.Query("page", "1"))
-	//perPage := 9
-	//var total int64
 	var clients []Client
 	var total int64
 
-	sql := "SELECT * FROM clients WHERE user_id = " + strconv.Itoa(userID)
+	sql := "SELECT * FROM clients WHERE deleted_at is null and user_id =  " + strconv.Itoa(userID)
 
 	if s != "" {
 		sql = fmt.Sprintf("%s AND fullname LIKE '%%%s%%'", sql, s)
