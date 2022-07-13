@@ -23,6 +23,7 @@ type IService interface {
 	DeleteDetailInvoice(detailInvoice DetailInvoice) (DetailInvoice, error)
 	PayInvoice(input payment.InputCreateTansaction, client client.Client) (string, error)
 	UpdateInvoice(invoice Invoice, urlPayment string) (Invoice, error)
+	ProcessPayment(input payment.InputTransactionNotif) (Invoice, error)
 }
 
 type service struct {
@@ -182,6 +183,30 @@ func (s *service) PayInvoice(input payment.InputCreateTansaction, client client.
 	}
 
 	return urlPayment, nil
+}
+
+func (s *service) ProcessPayment(input payment.InputTransactionNotif) (Invoice, error) {
+	transaction_id, _ := strconv.Atoi(input.OrderID)
+
+	invoice, err := s.repository.FindByID(transaction_id)
+	if err != nil {
+		return invoice, err
+	}
+
+	if input.PaymentType == "credit_card" && input.TransactionStatus == "capture" && input.FraudStatus == "accept" {
+		invoice.Status = "PAID"
+	} else if input.TransactionStatus == "settlement" {
+		invoice.Status = "PAID"
+	} else if input.TransactionStatus == "deny" || input.TransactionStatus == "expire" || input.TransactionStatus == "cancel" {
+		invoice.Status = "CANCELLED"
+	}
+
+	updatedInvoice, err := s.repository.UpdateInvoice(invoice)
+	if err != nil {
+		return updatedInvoice, err
+	}
+
+	return updatedInvoice, nil
 }
 
 func Mapping(lines [][]string) []InvoiceCSV {

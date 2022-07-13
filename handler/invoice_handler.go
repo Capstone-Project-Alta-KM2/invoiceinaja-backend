@@ -373,3 +373,25 @@ func (h *InvoiceHandler) InvoicePay(c *gin.Context) {
 
 	c.JSON(http.StatusOK, res)
 }
+
+func (h *InvoiceHandler) GetNotification(c *gin.Context) {
+	var input payment.InputTransactionNotif
+
+	err := c.ShouldBindJSON(&input)
+	if err != nil {
+		response := helper.ApiResponse("Failed to process notification", http.StatusBadRequest, "error", nil, err)
+		c.JSON(http.StatusBadRequest, response)
+
+		return
+	}
+
+	_, errU := h.invoiceService.ProcessPayment(input)
+	if errU != nil {
+		response := helper.ApiResponse("Failed to process notification", http.StatusBadRequest, "error", nil, errU)
+		c.JSON(http.StatusBadRequest, response)
+
+		return
+	}
+
+	c.JSON(http.StatusOK, input)
+}

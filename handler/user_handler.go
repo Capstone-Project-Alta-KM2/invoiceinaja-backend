@@ -159,7 +159,7 @@ func (h *UserHandler) Login(c *gin.Context) {
 
 	res := helper.ApiResponse("Login Successfully", http.StatusOK, "success", nil, formatter)
 
-	c.JSON(http.StatusCreated, res)
+	c.JSON(http.StatusOK, res)
 }
 
 func (h *UserHandler) UploadAvatar(c *gin.Context) {

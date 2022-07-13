@@ -50,6 +50,7 @@ func APIRoutes(
 	api.GET("/invoices/:id", auth.AuthMiddleware(authService, userService), invoiceHandler.GetInvoicesByID)
 	api.DELETE("/invoices/:id", auth.AuthMiddleware(authService, userService), invoiceHandler.DeleteInvoice)
 	api.POST("/invoice_payments", invoiceHandler.InvoicePay)
+	api.POST("/invoice_payments/notification", invoiceHandler.GetNotification)
 
 	// dashboard
 	api.GET("/overall", auth.AuthMiddleware(authService, userService), dashboardHandler.GetDataOverall)
