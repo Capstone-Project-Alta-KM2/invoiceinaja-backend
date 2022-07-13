@@ -51,7 +51,7 @@ func APIRoutes(
 	api.DELETE("/invoices/:id", auth.AuthMiddleware(authService, userService), invoiceHandler.DeleteInvoice)
 	api.POST("/invoice_payments", invoiceHandler.InvoicePay)
 
-	// daard
+	// dashboard
 	api.GET("/overall", auth.AuthMiddleware(authService, userService), dashboardHandler.GetDataOverall)
 	api.GET("/graphics", auth.AuthMiddleware(authService, userService), dashboardHandler.GetDataGraphic)
 }
