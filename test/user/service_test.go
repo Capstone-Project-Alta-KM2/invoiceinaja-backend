@@ -1,7 +1,6 @@
 package user
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
@@ -9,6 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"golang.org/x/crypto/bcrypt"
 )
 
 var repoUser = &RepositoryMock{Mock: mock.Mock{}}
@@ -22,28 +22,29 @@ func TestRegister(t *testing.T) {
 		BusinessName: "asda",
 		Password:     "password",
 	}
-	// passwordHash, _ := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.MinCost)
-	user := user.User{
+
+	passwordHash, _ := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.MinCost)
+
+	usr := user.User{
 		ID:           0,
 		Fullname:     "fahmi",
 		Email:        "fahmi@gmail.com",
 		NoTlpn:       "08123",
 		BusinessName: "asda",
-		Password:     "password",
+		Password:     string(passwordHash),
 		Role:         "user",
 		Avatar:       "images/default_user.png",
 		CreatedAt:    time.Time{},
 		UpdatedAt:    time.Time{},
 	}
 
-	repoUser.Mock.On("FindByEmail", input.Email).Return(user)
-	repoUser.Mock.On("Save", user).Return(user)
+	repoUser.Mock.On("FindByEmail", input.Email).Return(usr)
+	repoUser.Mock.On("Save", mock.AnythingOfType("user.User")).Return(usr)
 
 	result, err := serviceUser.Register(input)
 
-	fmt.Println(result)
 	assert.Nil(t, err)
 	assert.NotNil(t, result)
-	assert.Equal(t, user.ID, result.ID)
-	assert.Equal(t, user.Fullname, result.Fullname)
+	assert.Equal(t, usr.ID, result.ID)
+	assert.True(t, bcrypt.CompareHashAndPassword([]byte(usr.Password), []byte(input.Password)) == nil)
 }
