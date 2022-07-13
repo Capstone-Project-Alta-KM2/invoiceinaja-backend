@@ -338,8 +338,6 @@ func (h *InvoiceHandler) InvoicePay(c *gin.Context) {
 		return
 	}
 
-	// currentUser := c.MustGet("currentUser").(user.User)
-
 	invoice, errInv := h.invoiceService.GetByID(input.InvoiceID)
 	if errInv != nil {
 		res := helper.ApiResponse("Invoice Not Found", http.StatusBadRequest, "failed", nil, err)
@@ -347,12 +345,6 @@ func (h *InvoiceHandler) InvoicePay(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, res)
 		return
 	}
-	// if invoice.Client.UserID != currentUser.ID {
-	// 	res := helper.ApiResponse("Invoice Not Found", http.StatusBadRequest, "failed", nil, err)
-
-	// 	c.JSON(http.StatusBadRequest, res)
-	// 	return
-	// }
 
 	url, errTrans := h.invoiceService.PayInvoice(input, invoice.Client)
 	if errTrans != nil {

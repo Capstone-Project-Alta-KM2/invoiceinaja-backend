@@ -38,36 +38,27 @@ func (r *RepositoryMock) FindById(id int) (user.User, error) {
 }
 
 func (r *RepositoryMock) FindByEmail(email string) (user.User, error) {
-	var user user.User
+	// var user user.User
 	argument := r.Mock.Called(email)
 	if argument.Get(0) == nil {
-		return user, errors.New("ada yang salah")
+		return user.User{}, errors.New("ada yang salah")
 	} else {
-		// user := argument.Get(0).(user.User)
+		user := argument.Get(0).(user.User)
 		return user, nil
 	}
 }
 
-func (r *RepositoryMock) Update(user user.User) (user.User, error) {
-	argument := r.Mock.Called(user)
+func (r *RepositoryMock) Update(params user.User) (user.User, error) {
+	argument := r.Mock.Called(params)
 	if argument.Get(0) == nil {
-		return user, errors.New("ada yang salah")
+		return user.User{}, errors.New("ada yang salah")
 	} else {
-		// newUser := argument.Get(0).(user.User)
-		return user, nil
-	}
-}
-func (r *RepositoryMock) UpdateByID(user user.User) (user.User, error) {
-	argument := r.Mock.Called(user)
-	if argument.Get(0) == nil {
-		return user, errors.New("ada yang salah")
-	} else {
-		// newUser := argument.Get(0).(user.User)
-		return user, nil
+		newUser := argument.Get(0).(user.User)
+		return newUser, nil
 	}
 }
 
-func (r *RepositoryMock) DeleteUser(user user.User) (user.User, error) {
+func (r *RepositoryMock) Delete(user user.User) (user.User, error) {
 	argument := r.Mock.Called(user)
 	if argument.Get(0) == nil {
 		return user, errors.New("ada yang salah")
