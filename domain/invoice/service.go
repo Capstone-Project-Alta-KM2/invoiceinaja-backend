@@ -24,6 +24,7 @@ type IService interface {
 	PayInvoice(input payment.InputCreateTansaction, client client.Client) (string, error)
 	UpdateInvoice(invoice Invoice, urlPayment string) (Invoice, error)
 	ProcessPayment(input payment.InputTransactionNotif) (Invoice, error)
+	CheckDate(invoices []Invoice) ([]Invoice, error)
 }
 
 type service struct {
@@ -169,6 +170,20 @@ func (s *service) UpdateInvoice(invoice Invoice, urlPayment string) (Invoice, er
 	}
 
 	return updatedItem, nil
+}
+
+func (s *service) CheckDate(invoices []Invoice) ([]Invoice, error) {
+	for _, v := range invoices {
+		if time.Now().After(helper.ConvStingDate(v.InvoiceDue)) {
+			v.Status = "OVERDUE"
+			_, err := s.repository.UpdateInvoice(v)
+			if err != nil {
+				return invoices, err
+			}
+		}
+	}
+
+	return invoices, nil
 }
 
 func (s *service) PayInvoice(input payment.InputCreateTansaction, client client.Client) (string, error) {

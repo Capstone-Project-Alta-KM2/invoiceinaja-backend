@@ -50,10 +50,11 @@ func (h *DashboardHandler) GetDataGraphic(c *gin.Context) {
 		return
 	}
 
-	////////////////////////////////
-	s := invoice.GraphicInvoice(invoices)
+	h.invoiceService.CheckDate(invoices)
 
-	//////////////////////////////////
+	///////////////////////////////////
+	s := invoice.GraphicInvoice(invoices)
+	///////////////////////////////////
 
 	//formatter := invoice.FormatInvoices(invoices)
 	res := helper.ApiResponse("invoices", http.StatusOK, "success", nil, s)
