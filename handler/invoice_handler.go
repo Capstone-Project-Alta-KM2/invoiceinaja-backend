@@ -37,9 +37,9 @@ func (h *InvoiceHandler) AddInvoice(c *gin.Context) {
 	// tangkap input body
 	err := c.ShouldBindJSON(&input)
 	if err != nil {
-		res := helper.ApiResponse("Add New Data Has Been Failed", http.StatusUnprocessableEntity, "failed", nil, err)
+		res := helper.ApiResponse("Add New Data Has Been Failed", http.StatusBadRequest, "failed", nil, err)
 
-		c.JSON(http.StatusUnprocessableEntity, res)
+		c.JSON(http.StatusBadRequest, res)
 		return
 	}
 
@@ -52,15 +52,15 @@ func (h *InvoiceHandler) AddInvoice(c *gin.Context) {
 		return
 	}
 	if client.UserID == 0 {
-		res := helper.ApiResponse("Client not found!", http.StatusUnprocessableEntity, "failed", nil, errClient)
+		res := helper.ApiResponse("Client not found!", http.StatusBadRequest, "failed", nil, errClient)
 
-		c.JSON(http.StatusUnprocessableEntity, res)
+		c.JSON(http.StatusBadRequest, res)
 		return
 	}
 	if client.UserID != currentUser.ID {
-		res := helper.ApiResponse("This is not your client!", http.StatusUnprocessableEntity, "failed", nil, errClient)
+		res := helper.ApiResponse("This is not your client!", http.StatusBadRequest, "failed", nil, errClient)
 
-		c.JSON(http.StatusUnprocessableEntity, res)
+		c.JSON(http.StatusBadRequest, res)
 		return
 	} else {
 		// record data invoice
@@ -87,9 +87,9 @@ func (h *InvoiceHandler) AddInvoice(c *gin.Context) {
 		}
 
 		data := gin.H{"is_recorded": true}
-		res := helper.ApiResponse("Order Has Been Created", http.StatusCreated, "success", nil, data)
+		res := helper.ApiResponse("Order Has Been Created", http.StatusOK, "success", nil, data)
 
-		c.JSON(http.StatusCreated, res)
+		c.JSON(http.StatusOK, res)
 	}
 
 }
@@ -209,8 +209,8 @@ func (h *InvoiceHandler) GenerateByCSV(c *gin.Context) {
 	}
 
 	data := gin.H{"is_recorded": true}
-	res := helper.ApiResponse("Invoices Has Been Created", http.StatusCreated, "success", nil, data)
-	c.JSON(http.StatusCreated, res)
+	res := helper.ApiResponse("Invoices Has Been Created", http.StatusOK, "success", nil, data)
+	c.JSON(http.StatusOK, res)
 }
 
 func (h *InvoiceHandler) GetInvoices(c *gin.Context) {
@@ -226,8 +226,8 @@ func (h *InvoiceHandler) GetInvoices(c *gin.Context) {
 	}
 
 	formatter := invoice.FormatInvoices(invoices)
-	res := helper.ApiResponse("invoices", http.StatusCreated, "success", nil, formatter)
-	c.JSON(http.StatusCreated, res)
+	res := helper.ApiResponse("invoices", http.StatusOK, "success", nil, formatter)
+	c.JSON(http.StatusOK, res)
 }
 
 func (h *InvoiceHandler) GetInvoicesByID(c *gin.Context) {
@@ -319,9 +319,9 @@ func (h *InvoiceHandler) DeleteInvoice(c *gin.Context) {
 	}
 
 	data := gin.H{"is_deleted": true}
-	res := helper.ApiResponse("Successfuly Delete Invoice", http.StatusBadRequest, "success", nil, data)
+	res := helper.ApiResponse("Successfuly Delete Invoice", http.StatusOK, "success", nil, data)
 
-	c.JSON(http.StatusCreated, res)
+	c.JSON(http.StatusOK, res)
 }
 
 func (h *InvoiceHandler) InvoicePay(c *gin.Context) {

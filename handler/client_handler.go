@@ -35,8 +35,8 @@ func (h *ClientHandler) AddClient(c *gin.Context) {
 		errors := helper.FormatValidationError(err)
 		errorMessage := gin.H{"errors": errors}
 
-		response := helper.ApiResponse("Add Client Failed!", http.StatusUnprocessableEntity, "error", nil, errorMessage)
-		c.JSON(http.StatusUnprocessableEntity, response)
+		response := helper.ApiResponse("Add Client Failed!", http.StatusBadRequest, "error", nil, errorMessage)
+		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
@@ -46,8 +46,8 @@ func (h *ClientHandler) AddClient(c *gin.Context) {
 	isEmailAvailable, errAvail := h.clientService.IsEmailClientAvailable(input.Email, currentUser.ID)
 	if errAvail != nil {
 		errorMessage := gin.H{"errors": "Server error"}
-		response := helper.ApiResponse("Email checking failed", http.StatusUnprocessableEntity, "failed", nil, errorMessage)
-		c.JSON(http.StatusUnprocessableEntity, response)
+		response := helper.ApiResponse("Email checking failed", http.StatusBadRequest, "failed", nil, errorMessage)
+		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
@@ -63,8 +63,8 @@ func (h *ClientHandler) AddClient(c *gin.Context) {
 			errors := helper.FormatValidationError(errClient)
 			errorMessage := gin.H{"errors": errors}
 
-			response := helper.ApiResponse("Failed to added New Client!", http.StatusUnprocessableEntity, "error", nil, errorMessage)
-			c.JSON(http.StatusUnprocessableEntity, response)
+			response := helper.ApiResponse("Failed to added New Client!", http.StatusBadRequest, "error", nil, errorMessage)
+			c.JSON(http.StatusBadRequest, response)
 			return
 		}
 
@@ -72,9 +72,9 @@ func (h *ClientHandler) AddClient(c *gin.Context) {
 			"status": "Successfully added New Client!",
 		}
 
-		res := helper.ApiResponse("Succsessfully created New Client!", http.StatusCreated, "success", nil, data)
+		res := helper.ApiResponse("Succsessfully created New Client!", http.StatusOK, "success", nil, data)
 
-		c.JSON(http.StatusCreated, res)
+		c.JSON(http.StatusOK, res)
 	}
 }
 
@@ -121,8 +121,8 @@ func (h *ClientHandler) AddClientsByCSV(c *gin.Context) {
 		if errAvail != nil {
 			os.Remove(path)
 			errorMessage := gin.H{"errors": "Server error"}
-			response := helper.ApiResponse("Email checking failed", http.StatusUnprocessableEntity, "failed", nil, errorMessage)
-			c.JSON(http.StatusUnprocessableEntity, response)
+			response := helper.ApiResponse("Email checking failed", http.StatusBadRequest, "failed", nil, errorMessage)
+			c.JSON(http.StatusBadRequest, response)
 			return
 		}
 		if !isEmailAvailable {
@@ -142,8 +142,8 @@ func (h *ClientHandler) AddClientsByCSV(c *gin.Context) {
 			errors := helper.FormatValidationError(errClient)
 			errorMessage := gin.H{"errors": errors}
 
-			response := helper.ApiResponse("Failed Add Client!", http.StatusUnprocessableEntity, "error", nil, errorMessage)
-			c.JSON(http.StatusUnprocessableEntity, response)
+			response := helper.ApiResponse("Failed Add Client!", http.StatusBadRequest, "error", nil, errorMessage)
+			c.JSON(http.StatusBadRequest, response)
 			return
 		}
 
@@ -201,25 +201,25 @@ func (h *ClientHandler) UpdateClient(c *gin.Context) {
 	var input client.InputUpdate
 	err := c.ShouldBindJSON(&input)
 	if err != nil {
-		res := helper.ApiResponse("Update Data Has Been Failed", http.StatusUnprocessableEntity, "failed", nil, err)
+		res := helper.ApiResponse("Update Data Has Been Failed", http.StatusBadRequest, "failed", nil, err)
 
-		c.JSON(http.StatusUnprocessableEntity, res)
+		c.JSON(http.StatusBadRequest, res)
 		return
 	}
 
 	_, errUpdate := h.clientService.UpdateClient(input, currentUser.ID, id)
 	if errUpdate != nil {
 		errorMessage := gin.H{"errors": "Client Data does'nt exist"}
-		res := helper.ApiResponse("Update Data Has Been Failed", http.StatusUnprocessableEntity, "failed", nil, errorMessage)
+		res := helper.ApiResponse("Update Data Has Been Failed", http.StatusBadRequest, "failed", nil, errorMessage)
 
-		c.JSON(http.StatusUnprocessableEntity, res)
+		c.JSON(http.StatusBadRequest, res)
 		return
 	}
 
 	data := gin.H{"is_uploaded": true}
-	res := helper.ApiResponse("Update Data Has Been Success", http.StatusCreated, "success", nil, data)
+	res := helper.ApiResponse("Update Data Has Been Success", http.StatusOK, "success", nil, data)
 
-	c.JSON(http.StatusCreated, res)
+	c.JSON(http.StatusOK, res)
 
 }
 
