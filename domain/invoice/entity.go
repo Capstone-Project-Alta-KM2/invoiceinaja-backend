@@ -49,7 +49,7 @@ type InvoiceCSV struct {
 }
 
 type Item struct {
-	ItemName string 
-	Price    int    
-	Quantity int    
+	ItemName string
+	Price    int
+	Quantity int
 }

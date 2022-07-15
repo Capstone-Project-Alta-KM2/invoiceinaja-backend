@@ -15,14 +15,6 @@ func NewRepositoryMock(mock mock.Mock) *RepositoryMock {
 	return &RepositoryMock{mock}
 }
 
-// Save(client Client) (Client, error)
-// 	FindAll(s string, userID, page, perPage int) ([]Client, int, error)
-// 	FindById(id int) (Client, error)
-// 	FindByEmail(email string, userID int) (Client, error)
-// 	Update(client Client) (Client, error)
-// 	Delete(client Client) (Client, error)
-// 	TotalCustomer(userID int) int
-
 func (r *RepositoryMock) Save(params client.Client) (client.Client, error) {
 	argument := r.Mock.Called(params)
 	if argument.Get(0) == nil {

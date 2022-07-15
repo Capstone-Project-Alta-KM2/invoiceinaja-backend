@@ -236,22 +236,38 @@ func (h *InvoiceHandler) GetInvoicesByID(c *gin.Context) {
 	// didapatkan dari JWT
 	currentUser := c.MustGet("currentUser").(user.User)
 
-	invoices, err := h.invoiceService.GetByID(id)
+	inv, err := h.invoiceService.GetByID(id)
 	if err != nil {
 		res := helper.ApiResponse("Invoice Not Found", http.StatusNotFound, "failed", nil, err)
 
 		c.JSON(http.StatusNotFound, res)
 		return
 	}
-	if invoices.Client.UserID != currentUser.ID {
+	if inv.Client.UserID != currentUser.ID {
 		res := helper.ApiResponse("Invoice Not Found", http.StatusNotFound, "failed", nil, err)
 
 		c.JSON(http.StatusNotFound, res)
 		return
 	}
 
-	formatter := invoice.FormatInvoice(invoices)
+	formatter := invoice.FormatInvoice(inv)
 	res := helper.ApiResponse("invoices", http.StatusOK, "success", nil, formatter)
+	c.JSON(http.StatusOK, res)
+}
+
+func (h *InvoiceHandler) GetClientInvoice(c *gin.Context) {
+	id, _ := strconv.Atoi(c.Param("id"))
+
+	inv, err := h.invoiceService.GetByID(id)
+	if err != nil {
+		res := helper.ApiResponse("Invoice Not Found", http.StatusNotFound, "failed", nil, err)
+
+		c.JSON(http.StatusNotFound, res)
+		return
+	}
+
+	// formatter := invoice.FormatInvoice(inv)
+	res := helper.ApiResponse("invoices", http.StatusOK, "success", nil, inv)
 	c.JSON(http.StatusOK, res)
 }
 

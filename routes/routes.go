@@ -42,6 +42,7 @@ func APIRoutes(
 	api.GET("/clients", auth.AuthMiddleware(authService, userService), clientHandler.GetClients)
 	api.PUT("/clients/:id", auth.AuthMiddleware(authService, userService), clientHandler.UpdateClient)
 	api.DELETE("/clients/:id", auth.AuthMiddleware(authService, userService), clientHandler.DeleteClient)
+	api.GET("/clients/invoices/:id", invoiceHandler.GetClientInvoice)
 
 	// invoice
 	api.POST("/invoices", auth.AuthMiddleware(authService, userService), invoiceHandler.AddInvoice)
