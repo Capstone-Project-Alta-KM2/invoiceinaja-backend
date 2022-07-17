@@ -86,8 +86,11 @@ func (h *InvoiceHandler) AddInvoice(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, res)
 		}
 
-		data := gin.H{"is_recorded": true}
-		res := helper.ApiResponse("Order Has Been Created", http.StatusOK, "success", nil, data)
+		inv, _ :=h.invoiceService.GetByID(newInvoice.ID)
+
+		formatter := invoice.FormatInvoice(inv)
+		// data := gin.H{"is_recorded": true}
+		res := helper.ApiResponse("Order Has Been Created", http.StatusOK, "success", nil, formatter)
 
 		c.JSON(http.StatusOK, res)
 	}
