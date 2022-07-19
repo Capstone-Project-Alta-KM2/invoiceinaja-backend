@@ -406,3 +406,11 @@ func (h *InvoiceHandler) GetNotification(c *gin.Context) {
 
 	c.JSON(http.StatusOK, input)
 }
+
+func (h *InvoiceHandler) SendReminder(c *gin.Context) {
+	// identifikasi apakah invoice H-1
+	// if true kirim email reminder
+	// id, _ := strconv.Atoi(c.Param("id"))
+
+	// utils.SendMailReminder()
+}
