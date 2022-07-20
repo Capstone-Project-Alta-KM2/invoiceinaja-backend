@@ -95,10 +95,10 @@ func (r *repository) Delete(client Client) (Client, error) {
 }
 
 func (r *repository) TotalCustomer(userID int) int {
-	var total int64
+	var total int
 
-	sql := "SELECT * FROM clients WHERE deleted_at IS NULL and user_id = " + strconv.Itoa(userID)
-	r.DB.Raw(sql).Count(&total)
+	sql := "SELECT COUNT(*) FROM clients WHERE deleted_at IS NULL and user_id = " + strconv.Itoa(userID)
+	r.DB.Raw(sql).Scan(&total)
 
-	return int(total)
+	return total
 }
