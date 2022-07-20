@@ -26,6 +26,7 @@ func SendMailInvoice(recaiver string, data SendEmailData) *mailjet.ResultsV31 {
 		"client_city":    data.Client.City,
 		"client_zip":     data.Client.ZipCode,
 		"client_company": data.Client.Company,
+		"link": data.Invoice.ID,
 	}
 	for i := 0; i < length; i++ {
 		variableHtml["item"+strconv.Itoa(i+1)] = data.Invoice.Items[i].ItemName
