@@ -1,23 +1,65 @@
 package utils
 
 import (
-	"fmt"
+	"log"
 
-	gomail "gopkg.in/gomail.v2"
+	"github.com/mailjet/mailjet-apiv3-go"
 )
 
-func SendMail(destination string, newPass string) {
-	abc := gomail.NewMessage()
-
-	abc.SetHeader("From", "bkppbogor12@gmail.com")
-	abc.SetHeader("To", destination)
-	abc.SetHeader("Subject", "Reset Password DKPP Kab.Bogor")
-	abc.SetBody("text/html", "Berikut ini kami berikan kata sandi untuk akun anda. <br/> <b>"+newPass+"</b> <br/> Mohon untuk segera login dan ganti password baru.")
-
-	a := gomail.NewDialer("smtp.gmail.com", 587, "bkppbogor12@gmail.com", "kokolopo")
-
-	if err := a.DialAndSend(abc); err != nil {
-		fmt.Println(err)
-		panic(err)
+func SendMailResetPassword(destination, newPassword string) *mailjet.ResultsV31 {
+	mailjetClient := mailjet.NewMailjetClient("5f4b8dba26ef85efb6dce6410157bbe9", "efd86ba2c3502512da935ad19de63869")
+	messagesInfo := []mailjet.InfoMessagesV31{
+		{
+			From: &mailjet.RecipientV31{
+				Email: "kokolopo321@gmail.com",
+				Name:  "InvoiceinAja",
+			},
+			To: &mailjet.RecipientsV31{
+				mailjet.RecipientV31{
+					Email: destination,
+					Name:  destination,
+				},
+			},
+			TemplateID:       4035911,
+			TemplateLanguage: true,
+			Subject:          "Reset Password InvoiceinAja",
+			Variables:        map[string]interface{}{"new_password": newPassword},
+		},
 	}
+	messages := mailjet.MessagesV31{Info: messagesInfo}
+	res, err := mailjetClient.SendMailV31(&messages)
+	if err != nil {
+		log.Fatal(err)
+	}
+	//fmt.Printf("Data: %+v\n", res)
+	return res
+}
+
+func SendMailOTP(destination, otp string) *mailjet.ResultsV31 {
+	mailjetClient := mailjet.NewMailjetClient("5f4b8dba26ef85efb6dce6410157bbe9", "efd86ba2c3502512da935ad19de63869")
+	messagesInfo := []mailjet.InfoMessagesV31{
+		{
+			From: &mailjet.RecipientV31{
+				Email: "kokolopo321@gmail.com",
+				Name:  "InvoiceinAja",
+			},
+			To: &mailjet.RecipientsV31{
+				mailjet.RecipientV31{
+					Email: destination,
+					Name:  destination,
+				},
+			},
+			TemplateID:       4061702,
+			TemplateLanguage: true,
+			Subject:          "OTP Code InvoiceinAja",
+			Variables:        map[string]interface{}{"code": otp},
+		},
+	}
+	messages := mailjet.MessagesV31{Info: messagesInfo}
+	res, err := mailjetClient.SendMailV31(&messages)
+	if err != nil {
+		log.Fatal(err)
+	}
+	//fmt.Printf("Data: %+v\n", res)
+	return res
 }

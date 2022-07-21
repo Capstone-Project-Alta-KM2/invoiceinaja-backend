@@ -2,11 +2,10 @@ package user
 
 import (
 	"errors"
-	"log"
+	"strconv"
 
 	utl "invoiceinaja/utils"
 
-	"github.com/sethvargo/go-password/password"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -17,6 +16,7 @@ type IService interface {
 	IsEmailAvailable(input InputCheckEmail) (bool, error)
 	SaveAvatar(id int, fileLocation string) (User, error)
 	UpdateUser(id int, input InputUpdate) (User, error)
+	ChangePassword(input InputChangePassword, userID int) (User, error)
 	ResetPassword(input InputCheckEmail) (User, error)
 }
 
@@ -85,7 +85,7 @@ func (s *service) Login(input InputLogin) (User, error) {
 		return user, err
 	}
 
-	//cek jika user tidak ada
+	// cek jika user tidak ada
 	if user.ID == 0 {
 		return user, errors.New("no user found")
 	}
@@ -147,6 +147,32 @@ func (s *service) UpdateUser(id int, input InputUpdate) (User, error) {
 	return updatedUser, nil
 }
 
+func (s *service) ChangePassword(input InputChangePassword, userID int) (User, error) {
+	user, err := s.repository.FindById(userID)
+	if err != nil {
+		return user, err
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(input.OldPassword))
+	if err != nil {
+		return user, err
+	}
+
+	//enkripsi password
+	passwordHash, errHash := bcrypt.GenerateFromPassword([]byte(input.NewPassword), bcrypt.MinCost)
+	if errHash != nil {
+		return user, errHash
+	}
+	user.Password = string(passwordHash)
+
+	updated, err := s.repository.Update(user)
+	if err != nil {
+		return user, err
+	}
+
+	return updated, nil
+}
+
 func (s *service) ResetPassword(input InputCheckEmail) (User, error) {
 	email := input.Email
 
@@ -160,21 +186,26 @@ func (s *service) ResetPassword(input InputCheckEmail) (User, error) {
 	}
 
 	// generate password
-	res, err := password.Generate(10, 7, 3, false, false)
-	if err != nil {
-		log.Fatal(err)
-	}
+	randomString := utl.RandomString(12)
+	newPassword := randomString + strconv.Itoa(user.ID)
 
 	//enkripsi password
-	passwordHash, _ := bcrypt.GenerateFromPassword([]byte(res), bcrypt.MinCost)
+	passwordHash, _ := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.MinCost)
 
 	user.Password = string(passwordHash)
 
 	updatePass, errPass := s.repository.Update(user)
 	if errPass != nil {
 		return user, err
-	} else {
-		utl.SendMail(email, res)
+	}
+
+	var a string
+	message := utl.SendMailResetPassword(email, newPassword)
+	for _, v := range message.ResultsV31 {
+		a = v.Status
+	}
+	if a != "success" {
+		return User{}, errors.New("failed send email")
 	}
 
 	return updatePass, nil

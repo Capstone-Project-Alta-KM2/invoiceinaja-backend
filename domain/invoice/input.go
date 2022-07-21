@@ -1,5 +1,10 @@
 package invoice
 
+import (
+	"invoiceinaja/domain/client"
+	"invoiceinaja/domain/user"
+)
+
 type InputAddInvoice struct {
 	Invoice       InvoiceData         `json:"invoice" binding:"required"`
 	DetailInvoice []DetailInvoiceData `json:"detail_invoice" binding:"required"`
@@ -17,3 +22,10 @@ type DetailInvoiceData struct {
 	Price    int    `json:"price" binding:"required"`
 	Quantity int    `json:"quantity" binding:"required"`
 }
+
+type SendEmailData struct {
+	Invoice Invoice
+	User    user.User
+	Client  client.Client
+}
+
