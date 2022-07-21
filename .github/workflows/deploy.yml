@@ -33,6 +33,7 @@ jobs:
           port: ${{ secrets.PORT }}
           script: |
             cd aplikasi/invoiceinaja-backend
+            git pull origin main
             ls
 
 # git pull origin dev
