@@ -33,11 +33,11 @@ jobs:
           port: ${{ secrets.PORT }}
           script: |
             cd aplikasi/invoiceinaja-backend
-            sudo rm -rf invoiceinaja
             sudo git pull origin main
-            sudo go build
-            sudo service goweb restart
 
+# sudo rm -rf invoiceinaja
+# sudo go build
+# sudo service goweb restart
 # git pull origin dev
 
 # # sudo kill $(sudo lsof -t -i:8080)
