@@ -33,6 +33,8 @@ jobs:
           port: ${{ secrets.PORT }}
           script: |
             cd aplikasi/invoiceinaja-backend
-            git pull origin dev
+            ls
+
+# git pull origin dev
 
 # # sudo kill $(sudo lsof -t -i:8080)

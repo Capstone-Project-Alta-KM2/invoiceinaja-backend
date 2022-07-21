@@ -52,9 +52,9 @@ func APIRoutes(
 	api.GET("/invoices", auth.AuthMiddleware(authService, userService), invoiceHandler.GetInvoices)
 	api.GET("/invoices/:id", auth.AuthMiddleware(authService, userService), invoiceHandler.GetInvoicesByID)
 	api.DELETE("/invoices/:id", auth.AuthMiddleware(authService, userService), invoiceHandler.DeleteInvoice)
-	// api.POST("/reminders", auth.AuthMiddleware(authService,userService), invoiceHandler.SendReminder)
 	api.POST("/invoice_payments", invoiceHandler.InvoicePay)
 	api.POST("/invoice_payments/notification", invoiceHandler.GetNotification)
+	// api.POST("/reminders", auth.AuthMiddleware(authService,userService), invoiceHandler.SendReminder)
 
 	// dashboard
 	api.GET("/overall", auth.AuthMiddleware(authService, userService), dashboardHandler.GetDataOverall)
