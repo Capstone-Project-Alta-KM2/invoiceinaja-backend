@@ -18,6 +18,7 @@ func APIRoutes(
 	dashboardHandler *handler.DashboardHandler,
 	authService auth.Service,
 	userService user.IService) {
+		
 	router.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "Wellcome to InvoiceinAja !!!!!",
